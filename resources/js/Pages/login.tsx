@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { router } from '@inertiajs/react';
 import {
     Zap, User, Lock, ArrowRight, Eye, EyeOff,
     LayoutGrid, ShieldCheck, AlertCircle
 } from 'lucide-react';
 
 export default function PosLoginPage() {
+    const [role, setRole] = useState<'KASIR' | 'ADMIN'>('KASIR');
     const [loginMethod, setLoginMethod] = useState<'CREDENTIALS' | 'PIN'>('CREDENTIALS');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -13,16 +15,29 @@ export default function PosLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleLogin = (e?: React.FormEvent) => {
+        e?.preventDefault();
         setIsLoading(true);
         setError('');
+
+        if (loginMethod === 'CREDENTIALS' && (!username || !password)) {
+            setIsLoading(false);
+            setError('Username dan kata sandi wajib diisi.');
+            return;
+        }
+
+        if (loginMethod === 'PIN' && pin.length < 6) {
+            setIsLoading(false);
+            setError('PIN harus 6 digit.');
+            return;
+        }
 
         // Simulasi Login
         setTimeout(() => {
             setIsLoading(false);
-            // Logic redirect ke main POS disini
-            alert("Login Berhasil! Mengalihkan ke POS...");
+            localStorage.setItem('pos_logged_in', 'true');
+            localStorage.setItem('pos_role', role);
+            router.visit(role === 'ADMIN' ? '/admin' : '/kasir');
         }, 1500);
     };
 
@@ -88,13 +103,35 @@ export default function PosLoginPage() {
                             <p className="text-slate-500">Silakan masuk untuk memulai shift Anda.</p>
                         </div>
 
+                        {/* Role Selector */}
+                        <div className="flex p-1 bg-white/50 border border-white/60 rounded-2xl mb-6">
+                            <button
+                                onClick={() => setRole('KASIR')}
+                                className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${role === 'KASIR'
+                                    ? 'bg-white text-indigo-600 shadow-md'
+                                    : 'text-slate-500 hover:text-slate-700'
+                                    }`}
+                            >
+                                <User size={16} /> Kasir
+                            </button>
+                            <button
+                                onClick={() => setRole('ADMIN')}
+                                className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${role === 'ADMIN'
+                                    ? 'bg-white text-indigo-600 shadow-md'
+                                    : 'text-slate-500 hover:text-slate-700'
+                                    }`}
+                            >
+                                <ShieldCheck size={16} /> Supervisor
+                            </button>
+                        </div>
+
                         {/* Login Method Toggle */}
                         <div className="flex p-1 bg-white/50 border border-white/60 rounded-2xl mb-8 relative">
                             <button
                                 onClick={() => setLoginMethod('CREDENTIALS')}
                                 className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${loginMethod === 'CREDENTIALS'
-                                        ? 'bg-white text-indigo-600 shadow-md'
-                                        : 'text-slate-500 hover:text-slate-700'
+                                    ? 'bg-white text-indigo-600 shadow-md'
+                                    : 'text-slate-500 hover:text-slate-700'
                                     }`}
                             >
                                 <User size={16} /> Username
@@ -102,8 +139,8 @@ export default function PosLoginPage() {
                             <button
                                 onClick={() => setLoginMethod('PIN')}
                                 className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${loginMethod === 'PIN'
-                                        ? 'bg-white text-indigo-600 shadow-md'
-                                        : 'text-slate-500 hover:text-slate-700'
+                                    ? 'bg-white text-indigo-600 shadow-md'
+                                    : 'text-slate-500 hover:text-slate-700'
                                     }`}
                             >
                                 <LayoutGrid size={16} /> Quick PIN
@@ -184,8 +221,8 @@ export default function PosLoginPage() {
                                         <div
                                             key={i}
                                             className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${i < pin.length
-                                                    ? 'bg-indigo-600 border-indigo-600 scale-110'
-                                                    : 'bg-white/50 border-slate-300'
+                                                ? 'bg-indigo-600 border-indigo-600 scale-110'
+                                                : 'bg-white/50 border-slate-300'
                                                 }`}
                                         />
                                     ))}

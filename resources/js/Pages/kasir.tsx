@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { router } from '@inertiajs/react';
 
 import CartPanel from './Pos/components/CartPanel';
 import HeaderBar from './Pos/components/HeaderBar';
@@ -13,6 +14,15 @@ import { CATEGORIES, MOCK_HISTORY, MOCK_PRODUCTS, QUICK_CASH_AMOUNTS } from './P
 import type { CartItem, Product } from './Pos/types';
 
 export default function PosInterface() {
+    useEffect(() => {
+        const isLoggedIn = localStorage.getItem('pos_logged_in') === 'true';
+        const role = localStorage.getItem('pos_role');
+
+        if (!isLoggedIn || role !== 'KASIR') {
+            router.visit('/login');
+        }
+    }, []);
+
     // State Management
     const [activeView, setActiveView] = useState<'menu' | 'history' | 'favorites' | 'profile' | 'settings'>('menu');
     const [cart, setCart] = useState<CartItem[]>([]);
@@ -95,8 +105,9 @@ export default function PosInterface() {
 
     const handleLogout = () => {
         if (confirm("Apakah Anda yakin ingin logout?")) {
-            alert("Logging out...");
-            // Logic logout here
+            localStorage.removeItem('pos_logged_in');
+            localStorage.removeItem('pos_role');
+            router.visit('/login');
         }
         setShowUserMenu(false);
     }

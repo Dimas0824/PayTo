@@ -6,7 +6,7 @@ This Laravel + Inertia.js + React application has been restructured into a modul
 
 ## Directory Structure
 
-```
+```markdown
 resources/js/
 ├── app.tsx                 # Inertia app entry point
 ├── bootstrap.js            # Laravel Echo, Axios config

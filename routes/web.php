@@ -6,6 +6,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/login', function () {
+    return inertia('login');
+});
+
 Route::get('/kasir', function () {
     return inertia('kasir');
 });
