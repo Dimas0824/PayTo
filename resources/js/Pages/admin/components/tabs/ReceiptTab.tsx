@@ -53,10 +53,10 @@ export default function ReceiptTab({ receiptHeader, receiptFooter, onChangeHeade
             </div>
 
             <div className="flex justify-center">
-                <div className="w-[320px] bg-white p-6 rounded-none shadow-2xl relative font-mono text-xs text-slate-800 border-t-8 border-slate-200">
+                <div className="w-full max-w-[360px] bg-white p-6 rounded-none shadow-2xl relative font-mono text-xs text-slate-800 border-t-8 border-slate-200">
                     <div className="absolute top-0 left-0 w-full h-2 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCA0IiB3aWR0aD0iMjAiIGhlaWdodD0iNCI+PHBhdGggZD0iTTAgNGw1LTRsNSA0bDUtNGw1IDR2LTRoLTIweiIgZmlsbD0iI2UzZTNiOCIvPjwvc3ZnPg==')] opacity-50"></div>
 
-                    <div className="text-center mb-4 whitespace-pre-wrap leading-tight">
+                    <div className="text-center mb-4 whitespace-pre-wrap leading-tight break-words">
                         {receiptHeader}
                     </div>
 
@@ -79,7 +79,7 @@ export default function ReceiptTab({ receiptHeader, receiptFooter, onChangeHeade
                     <div className="flex justify-between text-lg font-bold mt-2"><span>TOTAL</span><span>44.000</span></div>
                     <div className="border-b border-dashed border-slate-300 my-2"></div>
 
-                    <div className="text-center mt-4 whitespace-pre-wrap leading-tight text-slate-600">
+                    <div className="text-center mt-4 whitespace-pre-wrap leading-tight text-slate-600 break-words">
                         {receiptFooter}
                     </div>
 

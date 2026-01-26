@@ -16,18 +16,18 @@ export default function ProfileTab({ profile }: ProfileTabProps) {
             <div className="bg-white/40 backdrop-blur-xl border border-white/60 rounded-[2rem] p-8 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-200 rounded-full blur-[80px] opacity-40 -mr-16 -mt-16 pointer-events-none"></div>
 
-                <div className="flex items-center gap-8 relative z-10">
-                    <div className="w-32 h-32 rounded-full p-1 bg-white shadow-xl shadow-indigo-100 relative group cursor-pointer">
+                <div className="flex flex-col gap-6 relative z-10 lg:flex-row lg:items-center">
+                    <div className="w-32 h-32 rounded-full p-1 bg-white shadow-xl shadow-indigo-100 relative group cursor-pointer mx-auto lg:mx-0">
                         <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Supervisor" alt="Profile" className="w-full h-full rounded-full object-cover bg-slate-50" />
                         <div className="absolute bottom-1 right-1 bg-indigo-600 text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
                             <Edit size={16} />
                         </div>
                     </div>
-                    <div className="flex-1">
-                        <div className="flex justify-between items-start">
+                    <div className="flex-1 min-w-0">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div>
-                                <h2 className="text-3xl font-bold text-slate-800">{profile.name}</h2>
-                                <p className="text-slate-500 font-medium text-lg">{profile.role} • {profile.id}</p>
+                                <h2 className="text-2xl font-bold text-slate-800 break-words sm:text-3xl">{profile.name}</h2>
+                                <p className="text-slate-500 font-medium text-lg break-words">{profile.role} • {profile.id}</p>
                             </div>
                             <div className="text-right">
                                 <div className="px-4 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200 inline-flex items-center gap-2">
@@ -38,14 +38,14 @@ export default function ProfileTab({ profile }: ProfileTabProps) {
                             </div>
                         </div>
 
-                        <div className="flex gap-6 mt-6">
-                            <div className="flex items-center gap-2 text-sm text-slate-600 bg-white/50 px-4 py-2 rounded-xl border border-white/50">
+                        <div className="flex flex-wrap gap-3 mt-6">
+                            <div className="flex items-center gap-2 text-sm text-slate-600 bg-white/50 px-4 py-2 rounded-xl border border-white/50 max-w-full break-words">
                                 <Mail size={16} className="text-indigo-500" /> {profile.email}
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-slate-600 bg-white/50 px-4 py-2 rounded-xl border border-white/50">
+                            <div className="flex items-center gap-2 text-sm text-slate-600 bg-white/50 px-4 py-2 rounded-xl border border-white/50 max-w-full break-words">
                                 <Phone size={16} className="text-indigo-500" /> {profile.phone}
                             </div>
-                            <div className="flex items-center gap-2 text-sm text-slate-600 bg-white/50 px-4 py-2 rounded-xl border border-white/50">
+                            <div className="flex items-center gap-2 text-sm text-slate-600 bg-white/50 px-4 py-2 rounded-xl border border-white/50 max-w-full break-words">
                                 <Clock size={16} className="text-indigo-500" /> Bergabung: {profile.joinDate}
                             </div>
                         </div>

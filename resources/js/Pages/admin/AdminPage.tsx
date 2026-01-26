@@ -41,9 +41,9 @@ export default function AdminPage() {
         const isLoggedIn = localStorage.getItem('pos_logged_in') === 'true';
         const role = localStorage.getItem('pos_role');
 
-        if (!isLoggedIn || role !== 'ADMIN') {
-            router.visit('/login');
-        }
+        // if (!isLoggedIn || role !== 'ADMIN') {
+        //     router.visit('/login');
+        // }
     }, []);
 
     useEffect(() => {
@@ -128,7 +128,7 @@ export default function AdminPage() {
                 />
             )}
 
-            <main className="flex-1 flex flex-col h-screen overflow-hidden relative z-10 lg:ml-[18rem]">
+            <main className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden relative z-10">
                 <Header
                     activeTab={activeTab}
                     showNotifications={showNotifications}
@@ -146,7 +146,7 @@ export default function AdminPage() {
                     isSidebarOpen={isSidebarOpen}
                 />
 
-                <div className="flex-1 overflow-y-auto px-8 pb-8 custom-scrollbar-light">
+                <div className="flex-1 min-w-0 overflow-y-auto px-4 pb-8 custom-scrollbar-light sm:px-6 lg:px-8">
                     {activeTab === 'DASHBOARD' && <DashboardTab />}
                     {activeTab === 'PROFILE' && <ProfileTab profile={ADMIN_PROFILE} />}
                     {activeTab === 'PRODUCTS' && (

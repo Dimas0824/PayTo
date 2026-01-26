@@ -61,25 +61,25 @@ export default function SettingsTab({
                 </h3>
 
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/50">
-                        <div>
+                    <div className="flex flex-col gap-3 p-4 bg-white/50 rounded-2xl border border-white/50 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="min-w-0">
                             <div className="font-bold text-sm text-slate-700">Izinkan Stok Negatif</div>
                             <div className="text-xs text-slate-500">Transaksi tetap jalan meski stok 0</div>
                         </div>
                         <button
                             onClick={onToggleAllowNegativeStock}
-                            className={`text-2xl transition-colors ${allowNegativeStock ? 'text-indigo-600' : 'text-slate-300'}`}
+                            className={`self-start text-2xl transition-colors sm:self-auto ${allowNegativeStock ? 'text-indigo-600' : 'text-slate-300'}`}
                         >
                             {allowNegativeStock ? <ToggleRight size={40} fill="currentColor" /> : <ToggleLeft size={40} />}
                         </button>
                     </div>
 
-                    <div className="flex items-center justify-between p-4 bg-white/50 rounded-2xl border border-white/50">
-                        <div>
+                    <div className="flex flex-col gap-3 p-4 bg-white/50 rounded-2xl border border-white/50 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="min-w-0">
                             <div className="font-bold text-sm text-slate-700">Mode Debug / Dev</div>
                             <div className="text-xs text-slate-500">Menampilkan log error detail</div>
                         </div>
-                        <button className="text-2xl text-slate-300">
+                        <button className="self-start text-2xl text-slate-300 sm:self-auto">
                             <ToggleLeft size={40} />
                         </button>
                     </div>
@@ -96,8 +96,8 @@ export default function SettingsTab({
                 </div>
             </div>
 
-            <div className="md:col-span-2 flex justify-end">
-                <button className="flex items-center gap-2 px-8 py-4 bg-slate-800 text-white rounded-2xl font-bold shadow-xl shadow-slate-300 hover:bg-slate-900 transition-all">
+            <div className="md:col-span-2 flex justify-center sm:justify-end">
+                <button className="flex w-full items-center justify-center gap-2 px-8 py-4 bg-slate-800 text-white rounded-2xl font-bold shadow-xl shadow-slate-300 hover:bg-slate-900 transition-all sm:w-auto">
                     <Save size={20} /> Simpan Perubahan
                 </button>
             </div>

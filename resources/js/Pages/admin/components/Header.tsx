@@ -65,8 +65,8 @@ export default function Header({
     isSidebarOpen,
 }: HeaderProps) {
     return (
-        <header className="px-8 py-6 flex justify-between items-center">
-            <div className="flex items-center gap-3">
+        <header className="px-4 py-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-6 lg:px-8">
+            <div className="flex items-start gap-3 min-w-0 sm:items-center">
                 <button
                     onClick={onToggleSidebar}
                     aria-label="Toggle sidebar"
@@ -76,17 +76,17 @@ export default function Header({
                     <Menu size={20} />
                 </button>
 
-                <div>
-                    <h2 className="text-2xl font-bold text-slate-800">
+                <div className="min-w-0">
+                    <h2 className="text-xl font-bold text-slate-800 break-words sm:text-2xl">
                         {headerTitleMap[activeTab]}
                     </h2>
-                    <p className="text-slate-500 text-sm mt-1">
+                    <p className="mt-1 text-sm text-slate-500 break-words">
                         {headerSubtitleMap[activeTab]}
                     </p>
                 </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 shrink-0">
                 <div className="relative" ref={notificationRef}>
                     <button
                         onClick={onToggleNotifications}

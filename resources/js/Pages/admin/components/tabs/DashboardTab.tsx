@@ -33,8 +33,8 @@ export default function DashboardTab() {
                 />
             </div>
 
-            <div className="grid grid-cols-3 gap-6">
-                <div className="col-span-2 bg-white/40 backdrop-blur-xl border border-white/60 rounded-[2rem] p-6 shadow-sm min-h-[300px]">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="bg-white/40 backdrop-blur-xl border border-white/60 rounded-[2rem] p-6 shadow-sm min-h-[300px] lg:col-span-2">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="font-bold text-slate-800">Trend Penjualan (7 Hari)</h3>
                         <button className="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-lg">Lihat Detail</button>
@@ -51,7 +51,7 @@ export default function DashboardTab() {
                     </div>
                 </div>
 
-                <div className="col-span-1 bg-white/40 backdrop-blur-xl border border-white/60 rounded-[2rem] p-6 shadow-sm">
+                <div className="bg-white/40 backdrop-blur-xl border border-white/60 rounded-[2rem] p-6 shadow-sm lg:col-span-1">
                     <h3 className="font-bold text-slate-800 mb-4">Aktivitas Terkini</h3>
                     <div className="space-y-4">
                         {[1, 2, 3].map((_, i) => (

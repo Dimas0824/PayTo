@@ -15,17 +15,17 @@ export default function ApprovalsTab({ logs }: ApprovalsTabProps) {
         <div className="animate-in slide-in-from-bottom-4 duration-500">
             <div className="grid grid-cols-1 gap-4">
                 {logs.map(log => (
-                    <div key={log.id} className="bg-white/40 backdrop-blur-md border border-white/60 rounded-2xl p-4 flex items-start gap-4 shadow-sm">
+                    <div key={log.id} className="bg-white/40 backdrop-blur-md border border-white/60 rounded-2xl p-4 flex flex-col gap-3 shadow-sm sm:flex-row sm:items-start">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${log.action === 'VOID_TRANSACTION' ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-600'
                             }`}>
                             <AlertTriangle size={20} />
                         </div>
-                        <div className="flex-1">
-                            <div className="flex justify-between">
-                                <h4 className="font-bold text-slate-800">{log.action.replace('_', ' ')}</h4>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                                <h4 className="font-bold text-slate-800 break-words">{log.action.replace('_', ' ')}</h4>
                                 <span className="text-xs font-mono text-slate-400">{log.time}</span>
                             </div>
-                            <p className="text-sm text-slate-600 mt-1">
+                            <p className="text-sm text-slate-600 mt-1 break-words">
                                 Kasir: <span className="font-medium text-slate-800">{log.cashier}</span> •
                                 Alasan: <span className="italic">"{log.reason}"</span>
                             </p>
