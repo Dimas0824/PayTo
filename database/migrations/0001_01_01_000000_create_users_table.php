@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('role', ['CASHIER', 'SUPERVISOR'])->default(value: 'CASHIER');
             $table->string('supervisor_pin_hash')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->timestamps();
         });
 
         Schema::create('sessions', function (Blueprint $table) {
@@ -29,6 +30,7 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             $table->longText('payload');
             $table->integer('last_activity')->index();
+            $table->timestamps();
         });
     }
 
