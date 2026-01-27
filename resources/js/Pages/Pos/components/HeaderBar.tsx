@@ -7,9 +7,10 @@ type HeaderBarProps = {
     onSearchChange: (value: string) => void;
     onBack: () => void;
     searchInputRef: React.RefObject<HTMLInputElement | null>;
+    displayName: string;
 };
 
-export default function HeaderBar({ activeView, searchQuery, onSearchChange, onBack, searchInputRef }: HeaderBarProps) {
+export default function HeaderBar({ activeView, searchQuery, onSearchChange, onBack, searchInputRef, displayName }: HeaderBarProps) {
     return (
         <header className="flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
@@ -24,7 +25,7 @@ export default function HeaderBar({ activeView, searchQuery, onSearchChange, onB
 
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
-                        {activeView === 'menu' && <>Hi, <span className="bg-clip-text text-transparent bg-linear-to-r from-indigo-600 to-violet-600">Budi Santoso</span></>}
+                        {activeView === 'menu' && <>Hi, <span className="bg-clip-text text-transparent bg-linear-to-r from-indigo-600 to-violet-600">{displayName}</span></>}
                         {activeView === 'history' && "Riwayat Transaksi"}
                         {activeView === 'favorites' && "Menu Favorit"}
                         {activeView === 'profile' && "Profil Pengguna"}

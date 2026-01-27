@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
+import axios from 'axios';
 
 import CartPanel from './Pos/components/CartPanel';
 import HeaderBar from './Pos/components/HeaderBar';
@@ -10,18 +11,11 @@ import FavoritesView from './Pos/components/views/FavoritesView';
 import HistoryView from './Pos/components/views/HistoryView';
 import ProfileView from './Pos/components/views/ProfileView';
 import SettingsView from './Pos/components/views/SettingsView';
-import { CATEGORIES, MOCK_HISTORY, MOCK_PRODUCTS, QUICK_CASH_AMOUNTS } from './Pos/data';
+import { CATEGORIES, QUICK_CASH_AMOUNTS } from './Pos/data';
 import type { CartItem, Product } from './Pos/types';
 
 export default function PosInterface() {
-    useEffect(() => {
-        const isLoggedIn = localStorage.getItem('pos_logged_in') === 'true';
-        const role = localStorage.getItem('pos_role');
-
-        if (!isLoggedIn || role !== 'KASIR') {
-            router.visit('/login');
-        }
-    }, []);
+    // authentication and role will be validated by the backend header/profile controller
 
     // State Management
     const [activeView, setActiveView] = useState<'menu' | 'history' | 'favorites' | 'profile' | 'settings'>('menu');
@@ -56,6 +50,13 @@ export default function PosInterface() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    const { products: serverProducts = [], history: serverHistory = [], profile: serverProfile = {} } = usePage().props as any;
+
+    const [productsData, setProductsData] = useState<any[]>(Array.isArray(serverProducts) ? serverProducts : []);
+    const [historyData, setHistoryData] = useState<any[]>(Array.isArray(serverHistory) ? serverHistory : []);
+    const [profileData, setProfileData] = useState<any>(serverProfile || {});
+    const [displayName, setDisplayName] = useState<string>('');
 
     // --- Computed ---
     const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
@@ -122,15 +123,66 @@ export default function PosInterface() {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
     };
 
+    // If server props are empty, fetch via API once on mount
+    useEffect(() => {
+        let mounted = true;
+
+        async function fetchIfEmpty() {
+            try {
+                // Fetch header first to get authenticated user info and role
+                const headerRes = await axios.get('/api/pos/header');
+                const header = headerRes.data?.data || {};
+                if (!mounted) return;
+                setDisplayName(header.display_name || '');
+                const role = (header.role || '').toString().toUpperCase();
+                if (role !== 'KASIR') {
+                    router.visit('/login');
+                    return;
+                }
+
+                if ((!productsData || productsData.length === 0)) {
+                    const res = await axios.get('/api/pos/products');
+                    if (!mounted) return;
+                    setProductsData(res.data.data || []);
+                }
+
+                if ((!historyData || historyData.length === 0)) {
+                    const res = await axios.get('/api/pos/history?limit=10');
+                    if (!mounted) return;
+                    setHistoryData(res.data.data || []);
+                }
+
+                if ((!profileData || Object.keys(profileData).length === 0)) {
+                    const res = await axios.get('/api/pos/profile');
+                    if (!mounted) return;
+                    setProfileData(res.data.data || {});
+                }
+            } catch (e) {
+                // silent
+            }
+        }
+
+        fetchIfEmpty();
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    // Use server-provided products (fallback to client-fetched)
+    const PRODUCTS = productsData || [];
+    const HISTORY = historyData || [];
+    const PROFILE = profileData || {};
+
     // Filter products for Catalog
-    const filteredProducts = MOCK_PRODUCTS.filter(p => {
+    const filteredProducts = PRODUCTS.filter((p: any) => {
         const matchCat = selectedCategory === 'All' || p.category === selectedCategory;
         const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.sku.toLowerCase().includes(searchQuery.toLowerCase());
         return matchCat && matchSearch;
     });
 
     // Filter products for Favorites
-    const favoriteProducts = MOCK_PRODUCTS.filter(p => p.isFavorite);
+    const favoriteProducts = PRODUCTS.filter((p: any) => p.isFavorite);
 
     return (
         // Main Background
@@ -163,6 +215,7 @@ export default function PosInterface() {
                     onSearchChange={setSearchQuery}
                     onBack={() => setActiveView('menu')}
                     searchInputRef={searchInputRef}
+                    displayName={displayName || PROFILE.displayName || 'Kasir'}
                 />
 
                 {/* --- VIEW: CATALOG (MENU) --- */}
@@ -179,7 +232,7 @@ export default function PosInterface() {
 
                 {/* --- VIEW: HISTORY --- */}
                 {activeView === 'history' && (
-                    <HistoryView history={MOCK_HISTORY} formatRupiah={formatRupiah} />
+                    <HistoryView history={HISTORY} formatRupiah={formatRupiah} />
                 )}
 
                 {/* --- VIEW: FAVORITES --- */}
@@ -189,7 +242,7 @@ export default function PosInterface() {
 
                 {/* --- VIEW: PROFILE --- */}
                 {activeView === 'profile' && (
-                    <ProfileView />
+                    <ProfileView profile={PROFILE} />
                 )}
 
                 {/* --- VIEW: SETTINGS --- */}

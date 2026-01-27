@@ -1,4 +1,3 @@
-import React from 'react';
 import { Plus, Star, Tag } from 'lucide-react';
 
 import type { Product } from '../types';

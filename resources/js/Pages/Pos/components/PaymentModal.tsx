@@ -64,7 +64,7 @@ export default function PaymentModal({
                         </button>
                     ))}
 
-                    <button onClick={onClose} className="mt-auto py-4 font-bold text-xs text-slate-400 hover:text-slate-600 transition-colors uppercase tracking-wider">
+                    <button onClick={onClose} className="mt-auto py-4 font-bold text-xs bg-red-400 rounded-2xl text-white hover:text-white transition-colors uppercase tracking-wider">
                         Batalkan
                     </button>
                 </div>
