@@ -11,6 +11,9 @@ type PaymentModalProps = {
     onCheckout: () => void;
     quickCashAmounts: number[];
     grandTotal: number;
+    taxTotal: number;
+    discountTotal: number;
+    totalDue: number;
     subtotal: number;
     change: number;
     formatRupiah: (num: number) => string;
@@ -26,6 +29,9 @@ export default function PaymentModal({
     onCheckout,
     quickCashAmounts,
     grandTotal,
+    taxTotal,
+    discountTotal,
+    totalDue,
     subtotal,
     change,
     formatRupiah,
@@ -73,7 +79,29 @@ export default function PaymentModal({
                     <div className="max-w-sm mx-auto w-full">
                         <div className="text-center mb-8">
                             <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mb-2">Total Harus Dibayar</p>
-                            <h2 className="text-5xl font-mono font-bold text-slate-800 tracking-tighter">{formatRupiah(grandTotal + (subtotal * 0.11)).replace(",00", "")}</h2>
+                            <h2 className="text-5xl font-mono font-bold text-slate-800 tracking-tighter">{formatRupiah(totalDue).replace(",00", "")}</h2>
+                        </div>
+
+                        <div className="mb-6 space-y-2 rounded-2xl bg-white/70 border border-white/60 p-4 text-xs text-slate-500">
+                            <div className="flex justify-between">
+                                <span>Subtotal</span>
+                                <span className="font-mono font-bold text-slate-700">{formatRupiah(subtotal)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Tax (11%)</span>
+                                <span className="font-mono font-bold text-slate-700">{formatRupiah(taxTotal)}</span>
+                            </div>
+                            {discountTotal > 0 && (
+                                <div className="flex justify-between text-emerald-600 font-semibold">
+                                    <span>Discount</span>
+                                    <span className="font-mono">-{formatRupiah(discountTotal)}</span>
+                                </div>
+                            )}
+                            <div className="h-px bg-slate-200/60" />
+                            <div className="flex justify-between text-slate-700 font-bold">
+                                <span>Total</span>
+                                <span className="font-mono">{formatRupiah(totalDue)}</span>
+                            </div>
                         </div>
 
                         {paymentMethod === 'CASH' && (
@@ -100,7 +128,7 @@ export default function PaymentModal({
                                             {amt / 1000}k
                                         </button>
                                     ))}
-                                    <button onClick={() => onCashReceivedChange((grandTotal + (subtotal * 0.11)).toString())} className="bg-indigo-50 text-indigo-700 font-bold text-xs rounded-xl border border-indigo-100 hover:bg-indigo-100 transition-colors">
+                                    <button onClick={() => onCashReceivedChange(totalDue.toString())} className="bg-indigo-50 text-indigo-700 font-bold text-xs rounded-xl border border-indigo-100 hover:bg-indigo-100 transition-colors">
                                         Uang Pas
                                     </button>
                                 </div>
@@ -113,11 +141,31 @@ export default function PaymentModal({
                                 </div>
 
                                 <button
-                                    disabled={!cashReceived || parseInt(cashReceived) < grandTotal}
+                                    disabled={!cashReceived || Number(cashReceived) < totalDue}
                                     onClick={onCheckout}
                                     className="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-slate-300/50 disabled:opacity-50 disabled:shadow-none hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
                                 >
                                     <Printer size={20} /> Cetak Struk
+                                </button>
+                            </div>
+                        )}
+
+                        {paymentMethod === 'EWALLET' && (
+                            <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+                                <div className="rounded-3xl border border-slate-200 bg-white p-5 text-center shadow-sm">
+                                    <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">QRIS</div>
+                                    <div className="mt-4 mx-auto w-44 h-44 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center relative overflow-hidden">
+                                        <div className="absolute inset-0 opacity-60" style={{ backgroundImage: 'linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(0deg, rgba(0,0,0,0.06) 1px, transparent 1px)', backgroundSize: '14px 14px' }}></div>
+                                        <div className="w-16 h-16 rounded-xl bg-white shadow-md flex items-center justify-center text-slate-500 text-xs font-bold">QR</div>
+                                    </div>
+                                    <p className="mt-4 text-xs text-slate-500">Tunjukkan QR ini ke pelanggan untuk pembayaran.</p>
+                                </div>
+
+                                <button
+                                    onClick={onCheckout}
+                                    className="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-slate-300/50 hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
+                                >
+                                    <Printer size={20} /> Konfirmasi Pembayaran
                                 </button>
                             </div>
                         )}

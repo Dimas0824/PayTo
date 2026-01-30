@@ -64,10 +64,12 @@ export default function PosInterface() {
     const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
     const totalDiscount = cart.reduce((acc, item) => acc + item.discount, 0);
     const grandTotal = subtotal - totalDiscount;
+    const taxTotal = subtotal * 0.11;
+    const totalDue = grandTotal + taxTotal;
     const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
 
     const change = paymentMethod === 'CASH' && cashReceived
-        ? parseInt(cashReceived) - grandTotal
+        ? Number(cashReceived) - totalDue
         : 0;
 
     // --- Handlers ---
@@ -96,14 +98,35 @@ export default function PosInterface() {
         setCart(prev => prev.filter(item => item.id !== id));
     };
 
-    const handleCheckout = () => {
+    const handleCheckout = async () => {
+        if (cart.length === 0) {
+            return;
+        }
+
+        if (paymentMethod === 'CASH' && (!cashReceived || Number(cashReceived) < totalDue)) {
+            return;
+        }
+
         setSyncStatus('syncing');
-        setTimeout(() => {
+
+        try {
+            await axios.post('/api/pos/checkout', {
+                payment_method: paymentMethod,
+                cash_received: paymentMethod === 'CASH' ? Number(cashReceived) : undefined,
+                items: cart.map((item) => ({
+                    product_id: item.id,
+                    qty: item.qty,
+                    discount_amount: item.discount,
+                })),
+            });
+
             setShowPaymentModal(false);
             setCart([]);
             setCashReceived("");
             setSyncStatus(isOffline ? 'pending' : 'synced');
-        }, 1000);
+        } catch (e) {
+            setSyncStatus('pending');
+        }
     };
 
     const handleLogout = () => {
@@ -281,6 +304,9 @@ export default function PosInterface() {
                 onCheckout={handleCheckout}
                 quickCashAmounts={QUICK_CASH_AMOUNTS}
                 grandTotal={grandTotal}
+                taxTotal={taxTotal}
+                discountTotal={totalDiscount}
+                totalDue={totalDue}
                 subtotal={subtotal}
                 change={change}
                 formatRupiah={formatRupiah}
