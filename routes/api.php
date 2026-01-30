@@ -6,4 +6,3 @@ use Illuminate\Support\Facades\Route;
 Route::get('/pos/products', [\App\Http\Controllers\Api\PosApiController::class, 'products']);
 Route::get('/pos/history', [\App\Http\Controllers\Api\PosApiController::class, 'history']);
 Route::get('/pos/profile', [\App\Http\Controllers\Api\PosApiController::class, 'profile']);
-Route::get('/pos/header', [\App\Http\Controllers\Api\PosApiController::class, 'header']);

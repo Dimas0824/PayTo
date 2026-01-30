@@ -10,7 +10,8 @@ class ProfileQueryController
 {
     public function fetch(?int $userId = null): array
     {
-        $user = $userId ? User::find($userId) : User::first();
+        $user = $userId ? User::find($userId) : auth()->user();
+        $user ??= User::first();
 
         $today = Carbon::now()->startOfDay();
         $salesQuery = Sale::query()
@@ -33,11 +34,17 @@ class ProfileQueryController
         $target = 1000000;
         $progress = $target > 0 ? round(($totalToday / $target) * 100) : 0;
 
+        $role = match ($user?->role) {
+            'CASHIER' => 'KASIR',
+            'SUPERVISOR' => 'ADMIN',
+            default => $user?->role ?? 'KASIR',
+        };
+
         return [
             'id' => $user?->id,
             'displayName' => $user?->name ?? 'Kasir',
             'employeeId' => $user ? sprintf('KSR-%03d', $user->id) : null,
-            'role' => $user?->role ?? 'CASHIER',
+            'role' => $role,
             'isActive' => (bool) ($user?->is_active ?? false),
             'totalToday' => $totalToday,
             'transactionsToday' => $transactionsToday,

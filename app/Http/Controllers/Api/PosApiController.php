@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Pos\HeaderQueryController;
 use App\Http\Controllers\Pos\HistoryQueryController;
 use App\Http\Controllers\Pos\ProductQueryController;
 use App\Http\Controllers\Pos\ProfileQueryController;
@@ -32,12 +31,5 @@ class PosApiController extends Controller
         $controller = new ProfileQueryController;
 
         return response()->json(['data' => $controller->fetch($userId ? (int) $userId : null)]);
-    }
-
-    public function header(Request $request)
-    {
-        $controller = new HeaderQueryController;
-
-        return response()->json(['data' => $controller->fetch()]);
     }
 }

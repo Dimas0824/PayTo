@@ -20,6 +20,15 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'username' => 'testuser',
+            'pin_hash' => bcrypt('123456'),
+            'role' => 'CASHIER',
+        ]);
+
+        User::factory()->create([
+            'name' => 'Supervisor User',
+            'username' => 'supervisor',
+            'pin_hash' => bcrypt('654321'),
+            'role' => 'SUPERVISOR',
         ]);
 
         $this->call(ProductReportSeeder::class);

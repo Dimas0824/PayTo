@@ -11,6 +11,7 @@ import FavoritesView from './Pos/components/views/FavoritesView';
 import HistoryView from './Pos/components/views/HistoryView';
 import ProfileView from './Pos/components/views/ProfileView';
 import SettingsView from './Pos/components/views/SettingsView';
+import UniversalModal from '../Components/UniversalModal';
 import { CATEGORIES, QUICK_CASH_AMOUNTS } from './Pos/data';
 import type { CartItem, Product } from './Pos/types';
 
@@ -27,6 +28,7 @@ export default function PosInterface() {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showApprovalModal, setShowApprovalModal] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [approvalReason, setApprovalReason] = useState("");
     const [supervisorPin, setSupervisorPin] = useState("");
 
@@ -105,13 +107,15 @@ export default function PosInterface() {
     };
 
     const handleLogout = () => {
-        if (confirm("Apakah Anda yakin ingin logout?")) {
-            localStorage.removeItem('pos_logged_in');
-            localStorage.removeItem('pos_role');
-            router.visit('/login');
-        }
         setShowUserMenu(false);
+        setShowLogoutModal(true);
     }
+
+    const confirmLogout = () => {
+        localStorage.removeItem('pos_logged_in');
+        localStorage.removeItem('pos_role');
+        router.visit('/login');
+    };
 
     const navigateTo = (view: typeof activeView) => {
         setActiveView(view);
@@ -130,12 +134,12 @@ export default function PosInterface() {
         async function fetchIfEmpty() {
             try {
                 // Fetch header first to get authenticated user info and role
-                const headerRes = await axios.get('/api/pos/header');
+                const headerRes = await axios.get('/api/pos/profile');
                 const header = headerRes.data?.data || {};
                 if (!mounted) return;
-                setDisplayName(header.display_name || '');
+                setDisplayName(header.display_name || header.displayName || '');
                 const role = (header.role || '').toString().toUpperCase();
-                if (role !== 'KASIR') {
+                if (role !== 'KASIR' && role !== 'CASHIER') {
                     router.visit('/login');
                     return;
                 }
@@ -280,6 +284,17 @@ export default function PosInterface() {
                 subtotal={subtotal}
                 change={change}
                 formatRupiah={formatRupiah}
+            />
+
+            <UniversalModal
+                isOpen={showLogoutModal}
+                title="Keluar dari POS?"
+                description="Anda akan keluar dari sesi kasir saat ini."
+                tone="warning"
+                confirmLabel="Ya, Keluar"
+                cancelLabel="Batal"
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={confirmLogout}
             />
 
             {/* Approval Modal logic remains similar, styled with rounded-[2.5rem] and bg-white/90 backdrop-blur-xl */}

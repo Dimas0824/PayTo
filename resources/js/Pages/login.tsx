@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
+import axios from 'axios';
 import {
     Zap, User, Lock, ArrowRight, Eye, EyeOff,
     LayoutGrid, ShieldCheck, AlertCircle, Check // Menambahkan import Check
@@ -15,7 +16,7 @@ export default function PosLoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleLogin = (e?: React.SyntheticEvent) => {
+    const handleLogin = async (e?: React.SyntheticEvent) => {
         e?.preventDefault();
         setIsLoading(true);
         setError('');
@@ -32,19 +33,23 @@ export default function PosLoginPage() {
             return;
         }
 
-        // Simulasi Login
-        setTimeout(() => {
-            setIsLoading(false);
-            localStorage.setItem('pos_logged_in', 'true');
-            localStorage.setItem('pos_role', role);
+        try {
+            const response = await axios.post('/login', {
+                role,
+                login_method: loginMethod,
+                username,
+                password,
+                pin,
+            });
 
-            // Ganti router.visit dengan window.location untuk demo
-            // router.visit(role === 'ADMIN' ? '/admin' : '/kasir');
-            const targetUrl = role === 'ADMIN' ? '/admin' : '/kasir';
-            console.log(`Navigating to: ${targetUrl}`);
-            alert(`Login Berhasil! Mengalihkan ke ${targetUrl}... (Demo Mode)`);
-            // window.location.href = targetUrl; // Uncomment untuk navigasi nyata
-        }, 1500);
+            const redirect = response.data?.redirect || (role === 'ADMIN' ? '/admin' : '/kasir');
+            router.visit(redirect);
+        } catch (err: any) {
+            const message = err?.response?.data?.message || 'Login gagal. Silakan coba lagi.';
+            setError(message);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handlePinInput = (digit: string) => {

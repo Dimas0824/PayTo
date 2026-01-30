@@ -16,6 +16,7 @@ import ReceiptTab from './components/tabs/ReceiptTab';
 import ApprovalsTab from './components/tabs/ApprovalsTab';
 import UsersTab from './components/tabs/UsersTab';
 import SettingsTab from './components/tabs/SettingsTab';
+import UniversalModal from '../../Components/UniversalModal';
 
 export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<AdminTab>('DASHBOARD');
@@ -33,6 +34,7 @@ export default function AdminPage() {
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isLargeScreen, setIsLargeScreen] = useState(true);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const notificationRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
@@ -80,6 +82,11 @@ export default function AdminPage() {
     }, []);
 
     const handleLogout = () => {
+        setShowUserMenu(false);
+        setShowLogoutModal(true);
+    };
+
+    const confirmLogout = () => {
         localStorage.removeItem('pos_logged_in');
         localStorage.removeItem('pos_role');
         router.visit('/login');
@@ -183,6 +190,17 @@ export default function AdminPage() {
                     )}
                 </div>
             </main>
+
+            <UniversalModal
+                isOpen={showLogoutModal}
+                title="Keluar dari Admin?"
+                description="Anda akan keluar dari dashboard admin."
+                tone="warning"
+                confirmLabel="Ya, Keluar"
+                cancelLabel="Batal"
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={confirmLogout}
+            />
         </div>
     );
 }

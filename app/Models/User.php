@@ -32,6 +32,9 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'password_hash',
+        'pin_hash',
+        'supervisor_pin_hash',
         'remember_token',
     ];
 
@@ -45,6 +48,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'password_hash' => 'hashed',
+            'pin_hash' => 'hashed',
         ];
     }
 
@@ -63,6 +68,26 @@ class User extends Authenticatable
             return null;
         }
 
-        return Hash::check($plainPassword, $user->password) ? $user : null;
+        return Hash::check($plainPassword, $user->password_hash) ? $user : null;
+    }
+
+    /**
+     * Attempt to retrieve an active user for the given PIN.
+     */
+    public static function fetchForPin(string $plainPin, ?string $role = null): ?self
+    {
+        $candidates = static::query()
+            ->when($role, fn (Builder $query) => $query->where('role', $role))
+            ->whereNotNull('pin_hash')
+            ->where('is_active', true)
+            ->cursor();
+
+        foreach ($candidates as $user) {
+            if (Hash::check($plainPin, $user->pin_hash)) {
+                return $user;
+            }
+        }
+
+        return null;
     }
 }
