@@ -65,11 +65,32 @@ const ImmersiveBackground = () => {
                     </linearGradient>
                 </defs>
                 {/* Wave 1 */}
-                <path d="M-100,300 Q400,500 800,300 T1800,400" fill="none" stroke="url(#lineGrad)" strokeWidth="2" className="animate-float-slow" />
+                <path
+                    d="M-100,300 Q400,500 800,300 T1800,400"
+                    fill="none"
+                    stroke="url(#lineGrad)"
+                    strokeWidth="2"
+                    className="animate-float-slow"
+                    style={{ animationDuration: '18s' }}
+                />
                 {/* Wave 2 */}
-                <path d="M-100,600 Q600,400 1200,700 T2200,500" fill="none" stroke="url(#lineGrad)" strokeWidth="1.5" className="animate-float-slow delay-1000" style={{ animationDuration: '20s' }} />
+                <path
+                    d="M-100,600 Q600,400 1200,700 T2200,500"
+                    fill="none"
+                    stroke="url(#lineGrad)"
+                    strokeWidth="1.5"
+                    className="animate-float-slow"
+                    style={{ animationDuration: '20s', animationDelay: '1s' }}
+                />
                 {/* Wave 3 (Subtle) */}
-                <path d="M0,100 Q300,50 600,150 T1200,100" fill="none" stroke="url(#lineGrad)" strokeWidth="1" className="animate-float-slow" style={{ opacity: 0.3, animationDuration: '25s' }} />
+                <path
+                    d="M0,100 Q300,50 600,150 T1200,100"
+                    fill="none"
+                    stroke="url(#lineGrad)"
+                    strokeWidth="1"
+                    className="animate-float-slow"
+                    style={{ opacity: 0.3, animationDuration: '25s' }}
+                />
             </svg>
 
             {/* 3. Firefly Orbs (Kunang-kunang) */}
@@ -86,7 +107,6 @@ const ImmersiveBackground = () => {
                         animationDuration: `${f.duration}s`,
                         animationDelay: `${f.delay}s`,
                         boxShadow: '0 0 10px 2px rgba(99, 102, 241, 0.3)', // Glow effect
-                        // We use standard keyframes defined below for compatibility
                     }}
                 />
             ))}
@@ -100,43 +120,7 @@ const ImmersiveBackground = () => {
                 }}>
             </div>
 
-            <style>{`
-        @keyframes firefly {
-          0% { transform: translate(0, 0) scale(1); opacity: 0; }
-          20% { opacity: 0.8; }
-          50% { transform: translate(20px, -40px) scale(1.2); opacity: 0.4; }
-          80% { opacity: 0.8; }
-          100% { transform: translate(-30px, -80px) scale(0.8); opacity: 0; }
-        }
-        .animate-firefly {
-          animation-name: firefly;
-          animation-timing-function: ease-in-out;
-          animation-iteration-count: infinite;
-        }
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(20px); }
-        }
-        .animate-float-slow {
-          animation: float-slow 15s ease-in-out infinite;
-        }
-        /* Custom blobs from tailwind config usually, added here for standalone support */
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
+
         </div>
     );
 };
@@ -146,19 +130,15 @@ const Navbar = () => (
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all animate-in fade-in slide-in-from-top-4 duration-700">
         <div className="max-w-7xl mx-auto bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl px-6 py-3 shadow-lg shadow-indigo-500/5 flex justify-between items-center">
             <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-tr from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-                    <Zap size={20} fill="currentColor" />
-                </div>
-                <span className="font-bold text-xl text-slate-800 tracking-tight">POS<span className="text-indigo-600">System</span></span>
+                <img src="storage/logs-removed.png" alt="PayTo" className="w-10 h-10 rounded-xl object-cover shadow-lg shadow-indigo-500/30" />
+                <span className="font-bold text-xl text-slate-800 tracking-tight">PayTo</span>
             </div>
-            <div className="hidden md:flex gap-8 text-sm font-bold text-slate-500">
+            {/* make this element group centered */}
+            <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 gap-8 text-sm font-bold text-slate-500">
+                <a href="#" className="hover:text-indigo-600 transition-colors">Beranda</a>
                 <a href="#features" className="hover:text-indigo-600 transition-colors">Keunggulan</a>
                 <a href="#ui" className="hover:text-indigo-600 transition-colors">Tampilan</a>
-                <a href="#pricing" className="hover:text-indigo-600 transition-colors">Harga</a>
             </div>
-            <button className="bg-slate-900 hover:bg-black text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-xl hover:shadow-2xl hover:-translate-y-0.5 transition-all">
-                Coba Demo
-            </button>
         </div>
     </nav>
 );
@@ -191,7 +171,6 @@ const Hero = () => (
                     Mulai Sekarang
                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
-                {/* Tonton Video button removed */}
             </div>
 
             {/* 3D FLOATING MOCKUP HERO */}
@@ -214,7 +193,7 @@ const Hero = () => (
                             </div>
                             <div className="flex items-center gap-4">
                                 <div className="text-right">
-                                    <p className="text-xs font-bold text-slate-800">Budi Santoso</p>
+                                    <p className="text-xs font-bold text-slate-800">Kasir OP</p>
                                     <p className="text-[10px] text-slate-500">Kasir - Shift Pagi</p>
                                 </div>
                                 <div className="w-10 h-10 bg-indigo-100 rounded-full"></div>
@@ -286,11 +265,11 @@ const Hero = () => (
                 <div className="absolute -left-8 bottom-1/4 bg-white p-4 rounded-3xl shadow-2xl shadow-indigo-500/20 z-30 animate-bounce-slow delay-700">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-                            <Shield size={20} />
+                            <Database size={20} />
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-slate-400">Security</p>
-                            <p className="text-lg font-bold text-slate-800">Protected</p>
+                            <p className="text-xs font-bold text-slate-400">Smart</p>
+                            <p className="text-lg font-bold text-slate-800">Inventory</p>
                         </div>
                     </div>
                 </div>
@@ -427,7 +406,7 @@ const Showcase = () => {
                         {/* Text Content */}
                         <div className={`lg:w-1/2 space-y-8 transition-all duration-1000 ease-out transform ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'}`}>
                             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-bold uppercase tracking-wider">
-                                <Star size={12} fill="currentColor" /> Premium Experience
+                                <Star size={12} fill="currentColor" /> User Experience
                             </div>
                             <h2 className="text-4xl lg:text-5xl font-bold text-white leading-tight">
                                 Kendali Penuh di <br />
@@ -503,24 +482,21 @@ const Footer = () => {
             <div ref={ref} className={`max-w-5xl mx-auto text-center relative z-10 transition-all duration-1000 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
                 <h2 className="text-4xl md:text-6xl font-black text-slate-900 mb-8 tracking-tight">Siap Untuk Upgrade?</h2>
                 <p className="text-xl text-slate-500 mb-10 max-w-2xl mx-auto">
-                    Jangan biarkan teknologi lama menghambat pertumbuhan bisnis Anda. Beralih ke POS System v2.0 hari ini.
+                    Jangan biarkan teknologi lama menghambat pertumbuhan bisnis Anda. Beralih ke PayTo v2.0 hari ini.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-200 hover:shadow-2xl hover:-translate-y-1">
                         Mulai Uji Coba Gratis
-                    </button>
-                    <button className="px-10 py-4 bg-slate-100 text-slate-700 rounded-2xl font-bold text-lg hover:bg-slate-200 transition-all">
-                        Hubungi Sales
                     </button>
                 </div>
             </div>
 
             <div className="mt-24 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center text-sm text-slate-400">
                 <div className="flex items-center gap-2 mb-4 md:mb-0 opacity-50 grayscale hover:grayscale-0 transition-all">
-                    <Zap size={20} className="text-indigo-600" fill="currentColor" />
-                    <span className="font-bold text-lg text-slate-800">POSSystem</span>
+                    <img src="storage/logs-removed.png" alt="PayTo" className="w-8 h-8 rounded-lg object-cover" />
+                    <span className="font-bold text-lg text-slate-800">PayTo</span>
                 </div>
-                <p>&copy; 2026 POS System Inc. All rights reserved.</p>
+                <p>&copy; 2026  PayTo Inc. All rights reserved.</p>
             </div>
         </footer>
     );
