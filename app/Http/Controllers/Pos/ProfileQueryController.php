@@ -11,7 +11,7 @@ class ProfileQueryController
     public function fetch(?int $userId = null): array
     {
         $user = $userId ? User::find($userId) : auth()->user();
-        $user ??= User::first();
+        $user ??= User::query()->where('role', 'CASHIER')->orderBy('id')->first();
 
         $today = Carbon::now()->startOfDay();
         $salesQuery = Sale::query()
