@@ -193,7 +193,7 @@ export default function PaymentModal({
                 {/* --- CONTENT AREA --- */}
                 <div className="flex-1 flex flex-col h-full bg-slate-50 md:bg-transparent overflow-hidden">
                     {/* Summary Header (Collapsible on Mobile) */}
-                    <div className="bg-white md:bg-transparent p-5 md:p-8 shadow-sm md:shadow-none z-10">
+                    <div className="bg-white md:bg-transparent py-3 px-5 md:py-4 md:px-7 shadow-sm md:shadow-none z-10">
                         <div className="text-left md:text-center w-full">
                             <div className="flex items-center justify-between md:justify-center w-full">
                                 {/* Mobile Only: Show Details Toggle */}
@@ -207,7 +207,7 @@ export default function PaymentModal({
                         </div>
 
                         {/* Collapsible Details */}
-                        <div className={`${showDetails || !isMobile ? 'block' : 'hidden'} mt-4 md:mt-6 animate-in slide-in-from-top-2`}>
+                        <div className={`${showDetails || !isMobile ? 'block' : 'hidden'} mt-3 md:mt-4 animate-in slide-in-from-top-2`}>
                             <div className="space-y-2 rounded-2xl bg-slate-50 md:bg-white/60 border border-slate-100 md:border-white/60 p-4 text-xs text-slate-500">
                                 <div className="flex justify-between">
                                     <span>Subtotal</span>
@@ -217,16 +217,17 @@ export default function PaymentModal({
                                     <span>Pajak (11%)</span>
                                     <span className="font-mono font-bold text-slate-700">{formatRupiah(taxTotal)}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span>Total Pembayaran</span>
-                                    <span className="font-mono text-[20px] font-bold text-slate-900">{formatRupiah(totalDue).replace(",00", "")}</span>
-                                </div>
                                 {discountTotal > 0 && (
                                     <div className="flex justify-between text-emerald-600 font-semibold">
                                         <span>Diskon</span>
                                         <span className="font-mono">-{formatRupiah(discountTotal)}</span>
                                     </div>
                                 )}
+                                <div className="flex justify-between">
+                                    <span>Total Pembayaran</span>
+                                    <span className="font-mono text-[20px] font-bold text-slate-900">{formatRupiah(totalDue).replace(",00", "")}</span>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -308,7 +309,7 @@ export default function PaymentModal({
 
                             {paymentMethod === 'EWALLET' && (
                                 <div className="flex flex-col h-full animate-in slide-in-from-right-4 duration-300">
-                                    <div className="mt-5 mx-auto w-full max-w-64 aspect-square rounded-2xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center relative overflow-hidden group">
+                                    <div className="mt-3 mx-auto w-full max-w-64 aspect-square rounded-2xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center relative overflow-hidden group">
                                         {/* Placeholder for QR Code Image */}
                                         <div className="w-20 h-20 rounded-xl bg-white shadow-md flex items-center justify-center text-slate-500 text-xs font-bold ring-4 ring-slate-50">QR CODE</div>
                                     </div>

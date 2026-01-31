@@ -72,7 +72,7 @@ export default function PosInterface() {
     const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
     const totalDiscount = cart.reduce((acc, item) => acc + item.discount, 0);
     const grandTotal = subtotal - totalDiscount;
-    const taxTotal = subtotal * 0.11;
+    const taxTotal = (subtotal - totalDiscount) * 0.11;
     const totalDue = grandTotal + taxTotal;
     const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
 
@@ -89,21 +89,23 @@ export default function PosInterface() {
                 return prev.map(p => {
                     if (p.id !== product.id) return p;
                     const nextQty = p.qty + 1;
+                    const discountAmount = (p.price * nextQty * p.discountPercent) / 100;
                     return {
                         ...p,
                         qty: nextQty,
-                        discount: p.discountPerUnit * nextQty,
+                        discount: discountAmount,
                     };
                 });
             }
-            const discountPerUnit = Number(product.discount ?? 0);
+            const discountPercent = Number(product.discount ?? 0);
+            const discountAmount = (product.price * 1 * discountPercent) / 100;
             return [
                 ...prev,
                 {
                     ...product,
                     qty: 1,
-                    discountPerUnit,
-                    discount: discountPerUnit,
+                    discountPercent,
+                    discount: discountAmount,
                 },
             ];
         });
@@ -113,10 +115,11 @@ export default function PosInterface() {
         setCart(prev => prev.map(item => {
             if (item.id === id) {
                 const newQty = Math.max(1, item.qty + delta);
+                const discountAmount = (item.price * newQty * item.discountPercent) / 100;
                 return {
                     ...item,
                     qty: newQty,
-                    discount: item.discountPerUnit * newQty,
+                    discount: discountAmount,
                 };
             }
             return item;

@@ -13,7 +13,7 @@ export type Product = {
 export type CartItem = Product & {
     qty: number;
     discount: number;
-    discountPerUnit: number;
+    discountPercent: number;
 };
 
 export type PaymentMethod = 'CASH' | 'EWALLET';

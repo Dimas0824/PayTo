@@ -40,8 +40,9 @@ class PosCheckoutController extends Controller
             $qty = (float) $item['qty'];
             $unitPrice = (float) $product->price;
             $lineSubtotal = $unitPrice * $qty;
-            $discountPerUnit = (float) ($product->discount ?? 0);
-            $discountPerUnit = min($discountPerUnit, $unitPrice);
+            $discountPercent = (float) ($product->discount ?? 0);
+            $discountPercent = max(0, min($discountPercent, 100));
+            $discountPerUnit = ($unitPrice * $discountPercent) / 100;
             $discountAmount = $discountPerUnit * $qty;
 
             if ($discountAmount > $lineSubtotal) {
@@ -75,7 +76,7 @@ class PosCheckoutController extends Controller
             ];
         }
 
-        $taxTotal = $subtotal * 0.11;
+        $taxTotal = ($subtotal - $discountTotal) * 0.11;
         $grandTotal = ($subtotal - $discountTotal) + $taxTotal;
 
         if ($paymentMethod === 'CASH' && $cashReceived < $grandTotal) {
