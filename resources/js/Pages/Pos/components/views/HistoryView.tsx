@@ -14,9 +14,28 @@ import type { TransactionHistory } from '../../types';
 type HistoryViewProps = {
     history: TransactionHistory[];
     formatRupiah: (num: number) => string;
+    startDate: string;
+    endDate: string;
+    onStartDateChange: (value: string) => void;
+    onEndDateChange: (value: string) => void;
+    onResetFilters: () => void;
+    page: number;
+    lastPage: number;
+    onPageChange: (page: number) => void;
 };
 
-export default function HistoryView({ history, formatRupiah }: HistoryViewProps) {
+export default function HistoryView({
+    history,
+    formatRupiah,
+    startDate,
+    endDate,
+    onStartDateChange,
+    onEndDateChange,
+    onResetFilters,
+    page,
+    lastPage,
+    onPageChange,
+}: HistoryViewProps) {
     const [expandedId, setExpandedId] = useState<string | null>(null);
 
     const toggle = (id: string) => {
@@ -26,6 +45,35 @@ export default function HistoryView({ history, formatRupiah }: HistoryViewProps)
     return (
         <div className="flex-1 overflow-y-auto pr-2 pb-4 -mr-2 custom-scrollbar-light">
             <div className="flex flex-col gap-3">
+                <div className="bg-white/40 backdrop-blur-md border border-white/50 rounded-3xl p-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <div className="flex flex-col">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Mulai</label>
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => onStartDateChange(e.target.value)}
+                                className="mt-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                            />
+                        </div>
+                        <div className="flex flex-col">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sampai</label>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(e) => onEndDateChange(e.target.value)}
+                                className="mt-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                            />
+                        </div>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={onResetFilters}
+                        className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50"
+                    >
+                        Reset Filter
+                    </button>
+                </div>
                 {history.map((tx) => {
                     const isOpen = expandedId === tx.id;
 
@@ -175,9 +223,27 @@ export default function HistoryView({ history, formatRupiah }: HistoryViewProps)
                     );
                 })}
 
-                <button className="w-full py-4 text-sm font-bold text-slate-400 hover:text-indigo-600 transition-colors border-t border-slate-200/50 mt-2">
-                    Lihat Semua Riwayat
-                </button>
+                <div className="flex items-center justify-between border-t border-slate-200/50 mt-2 pt-4">
+                    <button
+                        type="button"
+                        disabled={page <= 1}
+                        onClick={() => onPageChange(page - 1)}
+                        className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 disabled:opacity-50 hover:bg-slate-50"
+                    >
+                        Sebelumnya
+                    </button>
+                    <span className="text-xs font-bold text-slate-400">
+                        Halaman {page} dari {Math.max(lastPage, 1)}
+                    </span>
+                    <button
+                        type="button"
+                        disabled={page >= lastPage}
+                        onClick={() => onPageChange(page + 1)}
+                        className="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 disabled:opacity-50 hover:bg-slate-50"
+                    >
+                        Berikutnya
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -20,12 +20,13 @@ class ProfileQueryController
 
         $transactionsToday = $salesQuery->count();
         $totalToday = (float) $salesQuery->sum('grand_total');
-        $shiftStartRaw = $salesQuery->min('occurred_at');
-        $shiftStart = $shiftStartRaw ? Carbon::parse($shiftStartRaw) : null;
+        $loginAt = $user?->last_login_at ? Carbon::parse($user->last_login_at) : null;
+        $logoutAt = $user?->last_logout_at ? Carbon::parse($user->last_logout_at) : null;
 
         $durationText = '—';
-        if ($shiftStart) {
-            $diff = $shiftStart->diff(Carbon::now());
+        if ($loginAt) {
+            $endAt = $logoutAt ?? Carbon::now();
+            $diff = $loginAt->diff($endAt);
             $hours = $diff->h + ($diff->days * 24);
             $minutes = $diff->i;
             $durationText = sprintf('%dh %02dm', $hours, $minutes);
@@ -48,7 +49,8 @@ class ProfileQueryController
             'isActive' => (bool) ($user?->is_active ?? false),
             'totalToday' => $totalToday,
             'transactionsToday' => $transactionsToday,
-            'shiftStart' => $shiftStart?->format('H:i'),
+            'shiftStart' => $loginAt?->format('H:i'),
+            'shiftEnd' => $logoutAt?->format('H:i'),
             'shiftDuration' => $durationText,
             'target' => $target,
             'progressPercent' => $progress,

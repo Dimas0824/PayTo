@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Pos\HistoryQueryController;
 use App\Http\Controllers\Pos\ProductQueryController;
 use App\Http\Controllers\Pos\ProfileQueryController;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PosApiController extends Controller
@@ -19,10 +20,20 @@ class PosApiController extends Controller
 
     public function history(Request $request)
     {
-        $limit = (int) $request->query('limit', 10);
         $controller = new HistoryQueryController;
+        $page = (int) $request->query('page', 1);
+        $perPage = (int) $request->query('per_page', 10);
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+        $userId = $request->user()?->id ?? User::query()->where('role', 'CASHIER')->orderBy('id')->value('id');
 
-        return response()->json(['data' => $controller->fetch($limit)]);
+        $result = $controller->fetchPaginated($page, $perPage, [
+            'userId' => $userId,
+            'startDate' => $startDate ? (string) $startDate : null,
+            'endDate' => $endDate ? (string) $endDate : null,
+        ]);
+
+        return response()->json($result);
     }
 
     public function profile(Request $request)

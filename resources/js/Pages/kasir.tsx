@@ -67,6 +67,17 @@ export default function PosInterface() {
     const [historyData, setHistoryData] = useState<any[]>(Array.isArray(serverHistory) ? serverHistory : []);
     const [profileData, setProfileData] = useState<any>(serverProfile || {});
     const [displayName, setDisplayName] = useState<string>('');
+    const [historyPage, setHistoryPage] = useState(1);
+    const [historyMeta, setHistoryMeta] = useState({
+        currentPage: 1,
+        perPage: 10,
+        total: 0,
+        lastPage: 1,
+    });
+    const [historyFilters, setHistoryFilters] = useState({
+        startDate: '',
+        endDate: '',
+    });
 
     // --- Computed ---
     const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
@@ -182,7 +193,12 @@ export default function PosInterface() {
         setShowLogoutModal(true);
     }
 
-    const confirmLogout = () => {
+    const confirmLogout = async () => {
+        try {
+            await axios.post('/api/pos/logout');
+        } catch (e) {
+            // silent
+        }
         localStorage.removeItem('pos_logged_in');
         localStorage.removeItem('pos_role');
         router.visit('/login');
@@ -222,9 +238,23 @@ export default function PosInterface() {
                 }
 
                 if ((!historyData || historyData.length === 0)) {
-                    const res = await axios.get('/api/pos/history?limit=10');
+                    const res = await axios.get('/api/pos/history', {
+                        params: {
+                            page: historyPage,
+                            per_page: historyMeta.perPage,
+                            start_date: historyFilters.startDate || undefined,
+                            end_date: historyFilters.endDate || undefined,
+                        },
+                    });
                     if (!mounted) return;
                     setHistoryData(res.data.data || []);
+                    const meta = res.data.meta || {};
+                    setHistoryMeta({
+                        currentPage: Number(meta.current_page ?? historyPage),
+                        perPage: Number(meta.per_page ?? historyMeta.perPage),
+                        total: Number(meta.total ?? 0),
+                        lastPage: Number(meta.last_page ?? 1),
+                    });
                 }
 
                 if ((!profileData || Object.keys(profileData).length === 0)) {
@@ -243,6 +273,42 @@ export default function PosInterface() {
             mounted = false;
         };
     }, []);
+
+    useEffect(() => {
+        let mounted = true;
+
+        async function fetchHistory() {
+            try {
+                const res = await axios.get('/api/pos/history', {
+                    params: {
+                        page: historyPage,
+                        per_page: historyMeta.perPage,
+                        start_date: historyFilters.startDate || undefined,
+                        end_date: historyFilters.endDate || undefined,
+                    },
+                });
+                if (!mounted) return;
+                setHistoryData(res.data.data || []);
+                const meta = res.data.meta || {};
+                setHistoryMeta({
+                    currentPage: Number(meta.current_page ?? historyPage),
+                    perPage: Number(meta.per_page ?? historyMeta.perPage),
+                    total: Number(meta.total ?? 0),
+                    lastPage: Number(meta.last_page ?? 1),
+                });
+            } catch (e) {
+                // silent
+            }
+        }
+
+        if (activeView === 'history') {
+            fetchHistory();
+        }
+
+        return () => {
+            mounted = false;
+        };
+    }, [activeView, historyPage, historyFilters.startDate, historyFilters.endDate]);
 
     // Use server-provided products (fallback to client-fetched)
     const PRODUCTS = productsData || [];
@@ -307,7 +373,27 @@ export default function PosInterface() {
 
                 {/* --- VIEW: HISTORY --- */}
                 {activeView === 'history' && (
-                    <HistoryView history={HISTORY} formatRupiah={formatRupiah} />
+                    <HistoryView
+                        history={HISTORY}
+                        formatRupiah={formatRupiah}
+                        startDate={historyFilters.startDate}
+                        endDate={historyFilters.endDate}
+                        onStartDateChange={(value) => {
+                            setHistoryPage(1);
+                            setHistoryFilters(prev => ({ ...prev, startDate: value }));
+                        }}
+                        onEndDateChange={(value) => {
+                            setHistoryPage(1);
+                            setHistoryFilters(prev => ({ ...prev, endDate: value }));
+                        }}
+                        onResetFilters={() => {
+                            setHistoryPage(1);
+                            setHistoryFilters({ startDate: '', endDate: '' });
+                        }}
+                        page={historyMeta.currentPage}
+                        lastPage={historyMeta.lastPage}
+                        onPageChange={(page) => setHistoryPage(page)}
+                    />
                 )}
 
                 {/* --- VIEW: FAVORITES --- */}

@@ -9,6 +9,7 @@ type ProfileViewProps = {
         totalToday?: number;
         transactionsToday?: number;
         shiftStart?: string | null;
+        shiftEnd?: string | null;
         shiftDuration?: string | null;
         target?: number;
         progressPercent?: number;
@@ -61,10 +62,14 @@ export default function ProfileView({ profile = {} }: ProfileViewProps) {
                     <h3 className="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
                         <Clock size={20} className="text-slate-400" /> Informasi Shift
                     </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="p-4 bg-white/50 rounded-2xl border border-gray-200">
                             <div className="text-xs text-slate-500 mb-1">Jam Masuk</div>
                             <div className="font-bold text-lg text-slate-800">{profile.shiftStart ?? '—'}</div>
+                        </div>
+                        <div className="p-4 bg-white/50 rounded-2xl border border-gray-200">
+                            <div className="text-xs text-slate-500 mb-1">Jam Keluar</div>
+                            <div className="font-bold text-lg text-slate-800">{profile.shiftEnd ?? '—'}</div>
                         </div>
                         <div className="p-4 bg-white/50 rounded-2xl border border-gray-200">
                             <div className="text-xs text-slate-500 mb-1">Durasi Kerja</div>
