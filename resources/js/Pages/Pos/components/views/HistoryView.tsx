@@ -146,11 +146,27 @@ export default function HistoryView({ history, formatRupiah }: HistoryViewProps)
                                     </div>
 
                                     {/* TOTAL */}
-                                    <div className="flex justify-between items-center border-t border-slate-200/60 pt-3 text-sm">
-                                        <span className="font-bold text-slate-600">Total</span>
-                                        <span className="font-mono font-bold text-slate-800">
-                                            {formatRupiah(tx.total).replace(',00', '')}
-                                        </span>
+                                    <div className="space-y-2 border-t border-slate-200/60 pt-3 text-sm">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-slate-500">Total sebelum diskon</span>
+                                            <span className="font-mono font-semibold text-slate-700">
+                                                {formatRupiah(tx.totalBeforeDiscount).replace(',00', '')}
+                                            </span>
+                                        </div>
+                                        {tx.discountTotal > 0 && (
+                                            <div className="flex justify-between items-center text-emerald-600">
+                                                <span>Diskon</span>
+                                                <span className="font-mono font-semibold">
+                                                    -{formatRupiah(tx.discountTotal).replace(',00', '')}
+                                                </span>
+                                            </div>
+                                        )}
+                                        <div className="flex justify-between items-center">
+                                            <span className="font-bold text-slate-600">Total setelah diskon</span>
+                                            <span className="font-mono font-bold text-slate-800">
+                                                {formatRupiah(tx.totalAfterDiscount).replace(',00', '')}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

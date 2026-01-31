@@ -39,6 +39,9 @@ export type TransactionHistory = {
     time: string;
     status: 'PAID' | 'VOID';
     paymentMethod: 'CASH' | 'EWALLET';
+    totalBeforeDiscount: number;
+    discountTotal: number;
+    totalAfterDiscount: number;
     total: number;
     syncStatus: 'SYNCED' | 'PENDING';
     items: number;

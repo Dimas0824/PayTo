@@ -17,16 +17,22 @@ class ProductController extends Controller
     {
         $rows = Product::query()
             ->leftJoin('stock_items', 'products.id', '=', 'stock_items.product_id')
-            ->select('products.id', 'products.name', 'products.sku', 'products.price', 'products.uom', DB::raw('COALESCE(stock_items.on_hand, 0) as stock'))
+            ->select('products.id', 'products.name', 'products.sku', 'products.price', 'products.discount', 'products.uom', DB::raw('COALESCE(stock_items.on_hand, 0) as stock'))
             ->where('products.is_active', true)
             ->orderBy('products.name')
             ->get()
             ->map(function ($r) {
+                $discountPercent = (float) ($r->discount ?? 0);
+                $discountPercent = max(0, min($discountPercent, 100));
+                $discountedPrice = (float) $r->price - ((float) $r->price * $discountPercent / 100);
+
                 return [
                     'id' => $r->id,
                     'name' => $r->name,
                     'sku' => $r->sku,
                     'price' => (float) $r->price,
+                    'discount' => $discountPercent,
+                    'price_after_discount' => $discountedPrice,
                     'stock' => (int) $r->stock,
                     // Derive a simple category: cup => Minuman, else Makanan
                     'category' => $r->uom === 'cup' ? 'Minuman' : 'Makanan',

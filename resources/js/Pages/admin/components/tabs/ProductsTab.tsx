@@ -67,8 +67,15 @@ export default function ProductsTab({
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 font-mono font-bold text-slate-700">
-                                        Rp {product.price.toLocaleString('id-ID')}
+                                    <td className="px-6 py-4">
+                                        <div className="font-mono font-bold text-slate-700">
+                                            Rp {Math.round(product.price - (product.price * (product.discount ?? 0)) / 100).toLocaleString('id-ID')}
+                                        </div>
+                                        {product.discount > 0 && (
+                                            <div className="text-[10px] font-mono text-slate-400 line-through">
+                                                Rp {product.price.toLocaleString('id-ID')}
+                                            </div>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4">
                                         {product.discount > 0 ? (

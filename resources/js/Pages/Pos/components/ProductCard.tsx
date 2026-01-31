@@ -9,6 +9,12 @@ type ProductCardProps = {
 };
 
 export default function ProductCard({ product, onAdd, formatRupiah }: ProductCardProps) {
+    const hasDiscount = (product.discount ?? 0) > 0;
+    const discountPercent = product.discount ?? 0;
+    const discountedPrice = hasDiscount
+        ? product.price - (product.price * discountPercent) / 100
+        : product.price;
+
     return (
         <div
             onClick={() => onAdd(product)}
@@ -44,7 +50,21 @@ export default function ProductCard({ product, onAdd, formatRupiah }: ProductCar
                     <Tag size={10} className="opacity-70" /> {product.sku}
                 </span>
                 <div className="flex items-center justify-between mt-1">
-                    <span className="font-bold text-slate-800 text-base font-mono">{formatRupiah(product.price).replace(",00", "")}</span>
+                    <div className="flex flex-col">
+                        <span className="font-bold text-slate-800 text-base font-mono">
+                            {formatRupiah(discountedPrice).replace(",00", "")}
+                        </span>
+                        {hasDiscount && (
+                            <span className="text-[10px] font-mono text-slate-400 line-through">
+                                {formatRupiah(product.price).replace(",00", "")}
+                            </span>
+                        )}
+                    </div>
+                    {hasDiscount && (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md border border-rose-200 bg-rose-50 text-rose-600">
+                            -{discountPercent}%
+                        </span>
+                    )}
                     <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border backdrop-blur-sm ${product.stock < 10
                         ? 'text-amber-600 bg-amber-50/50 border-amber-200/50'
                         : 'text-slate-400 bg-white/50 border-white/50'
