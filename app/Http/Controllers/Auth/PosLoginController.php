@@ -25,8 +25,23 @@ class PosLoginController extends Controller
             ], 422);
         }
 
+        $today = now()->toDateString();
+        $workDate = $user->work_date?->toDateString();
+        $workSeconds = $workDate === $today ? (int) $user->work_seconds : 0;
+
+        if ($workDate === $today && $user->last_login_at) {
+            $lastLogoutAt = $user->last_logout_at;
+            $hasOpenSession = ! $lastLogoutAt || $lastLogoutAt->lessThan($user->last_login_at);
+
+            if ($hasOpenSession) {
+                $workSeconds += $user->last_login_at->diffInSeconds(now());
+            }
+        }
+
         $user->forceFill([
             'last_login_at' => now(),
+            'work_date' => $today,
+            'work_seconds' => $workSeconds,
         ])->save();
 
         Auth::login($user);

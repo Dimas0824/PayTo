@@ -22,13 +22,22 @@ class ProfileQueryController
         $totalToday = (float) $salesQuery->sum('grand_total');
         $loginAt = $user?->last_login_at ? Carbon::parse($user->last_login_at) : null;
         $logoutAt = $user?->last_logout_at ? Carbon::parse($user->last_logout_at) : null;
+        $today = Carbon::today();
+        $workSeconds = $user?->work_date && $user->work_date->equalTo($today)
+            ? (int) $user->work_seconds
+            : 0;
 
         $durationText = '—';
-        if ($loginAt) {
-            $endAt = $logoutAt ?? Carbon::now();
-            $diff = $loginAt->diff($endAt);
-            $hours = $diff->h + ($diff->days * 24);
-            $minutes = $diff->i;
+        if ($loginAt && $loginAt->isSameDay($today)) {
+            $isActiveSession = ! $logoutAt || $logoutAt->lessThan($loginAt);
+            if ($isActiveSession) {
+                $workSeconds += $loginAt->diffInSeconds(Carbon::now());
+            }
+        }
+
+        if ($workSeconds > 0) {
+            $hours = intdiv($workSeconds, 3600);
+            $minutes = intdiv($workSeconds % 3600, 60);
             $durationText = sprintf('%dh %02dm', $hours, $minutes);
         }
 

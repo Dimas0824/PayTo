@@ -25,6 +25,8 @@ class User extends Authenticatable
         'password',
         'last_login_at',
         'last_logout_at',
+        'work_date',
+        'work_seconds',
     ];
 
     /**
@@ -51,6 +53,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'last_logout_at' => 'datetime',
+            'work_date' => 'date',
+            'work_seconds' => 'integer',
             'password' => 'hashed',
             'password_hash' => 'hashed',
             'pin_hash' => 'hashed',
