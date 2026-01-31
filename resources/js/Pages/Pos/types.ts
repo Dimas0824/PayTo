@@ -2,6 +2,7 @@ export type Product = {
     id: number;
     name: string;
     price: number;
+    discount?: number;
     category: string;
     stock: number;
     sku: string;
@@ -12,6 +13,7 @@ export type Product = {
 export type CartItem = Product & {
     qty: number;
     discount: number;
+    discountPerUnit: number;
 };
 
 export type PaymentMethod = 'CASH' | 'EWALLET';

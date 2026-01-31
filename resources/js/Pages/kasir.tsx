@@ -32,7 +32,9 @@ export default function PosInterface() {
     const [showPaymentSuccessModal, setShowPaymentSuccessModal] = useState(false);
     const [lastPaymentSummary, setLastPaymentSummary] = useState<{
         method: 'CASH' | 'EWALLET';
+        invoiceNo?: string | null;
         total: number;
+        paidTotal: number;
         change: number;
     } | null>(null);
     const [approvalReason, setApprovalReason] = useState("");
@@ -84,9 +86,26 @@ export default function PosInterface() {
         setCart(prev => {
             const existing = prev.find(p => p.id === product.id);
             if (existing) {
-                return prev.map(p => p.id === product.id ? { ...p, qty: p.qty + 1 } : p);
+                return prev.map(p => {
+                    if (p.id !== product.id) return p;
+                    const nextQty = p.qty + 1;
+                    return {
+                        ...p,
+                        qty: nextQty,
+                        discount: p.discountPerUnit * nextQty,
+                    };
+                });
             }
-            return [...prev, { ...product, qty: 1, discount: 0 }];
+            const discountPerUnit = Number(product.discount ?? 0);
+            return [
+                ...prev,
+                {
+                    ...product,
+                    qty: 1,
+                    discountPerUnit,
+                    discount: discountPerUnit,
+                },
+            ];
         });
     };
 
@@ -94,7 +113,11 @@ export default function PosInterface() {
         setCart(prev => prev.map(item => {
             if (item.id === id) {
                 const newQty = Math.max(1, item.qty + delta);
-                return { ...item, qty: newQty };
+                return {
+                    ...item,
+                    qty: newQty,
+                    discount: item.discountPerUnit * newQty,
+                };
             }
             return item;
         }));
@@ -128,6 +151,8 @@ export default function PosInterface() {
 
             const responseStatus = (response?.data?.status || response?.data?.data?.status || response?.data?.payment?.status || '').toString().toLowerCase();
             const isPaymentConfirmed = ['confirmed', 'success', 'paid', 'settlement'].includes(responseStatus);
+            const responseTotals = response?.data?.totals || {};
+            const invoiceNo = response?.data?.invoice_no || response?.data?.invoiceNo || null;
 
             setShowPaymentModal(false);
             setCart([]);
@@ -137,8 +162,10 @@ export default function PosInterface() {
             if (isPaymentConfirmed) {
                 setLastPaymentSummary({
                     method: paymentMethod,
-                    total: totalDue,
-                    change,
+                    invoiceNo,
+                    total: Number(responseTotals?.grand_total ?? totalDue),
+                    paidTotal: Number(responseTotals?.paid_total ?? totalDue),
+                    change: Number(responseTotals?.change_total ?? change),
                 });
                 setShowPaymentSuccessModal(true);
             }
@@ -298,18 +325,20 @@ export default function PosInterface() {
             </div>
 
             {/* 3. CART PANEL (Unchanged Style) */}
-            <CartPanel
-                cart={cart}
-                subtotal={subtotal}
-                totalDiscount={totalDiscount}
-                grandTotal={grandTotal}
-                onClearCart={() => setCart([])}
-                onUpdateQty={updateQty}
-                onRemoveFromCart={removeFromCart}
-                onOpenApprovalModal={() => setShowApprovalModal(true)}
-                onCheckout={() => setShowPaymentModal(true)}
-                formatRupiah={formatRupiah}
-            />
+            {activeView !== 'profile' && activeView !== 'settings' && (
+                <CartPanel
+                    cart={cart}
+                    subtotal={subtotal}
+                    totalDiscount={totalDiscount}
+                    grandTotal={grandTotal}
+                    onClearCart={() => setCart([])}
+                    onUpdateQty={updateQty}
+                    onRemoveFromCart={removeFromCart}
+                    onOpenApprovalModal={() => setShowApprovalModal(true)}
+                    onCheckout={() => setShowPaymentModal(true)}
+                    formatRupiah={formatRupiah}
+                />
+            )}
 
             {/* --- PAYMENT MODAL (Modern Glass) --- */}
             <PaymentModal
@@ -350,6 +379,12 @@ export default function PosInterface() {
                 onClose={() => setShowPaymentSuccessModal(false)}
             >
                 <div className="space-y-2">
+                    {lastPaymentSummary?.invoiceNo && (
+                        <div className="flex justify-between">
+                            <span>Invoice</span>
+                            <span className="font-mono font-bold text-slate-700">{lastPaymentSummary.invoiceNo}</span>
+                        </div>
+                    )}
                     <div className="flex justify-between">
                         <span>Metode</span>
                         <span className="font-bold text-slate-700">{lastPaymentSummary?.method === 'CASH' ? 'Tunai' : 'QRIS'}</span>
@@ -357,6 +392,10 @@ export default function PosInterface() {
                     <div className="flex justify-between">
                         <span>Total</span>
                         <span className="font-mono font-bold text-slate-700">{formatRupiah(lastPaymentSummary?.total ?? 0)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span>Dibayar</span>
+                        <span className="font-mono font-bold text-slate-700">{formatRupiah(lastPaymentSummary?.paidTotal ?? 0)}</span>
                     </div>
                     {lastPaymentSummary?.method === 'CASH' && (
                         <div className="flex justify-between">

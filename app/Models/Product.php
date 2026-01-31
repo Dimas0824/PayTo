@@ -14,6 +14,7 @@ class Product extends Model
         'sku',
         'barcode',
         'price',
+        'discount',
         'cost',
         'uom',
         'is_active',
@@ -23,6 +24,7 @@ class Product extends Model
     {
         return [
             'price' => 'decimal:2',
+            'discount' => 'decimal:2',
             'cost' => 'decimal:2',
             'is_active' => 'boolean',
         ];

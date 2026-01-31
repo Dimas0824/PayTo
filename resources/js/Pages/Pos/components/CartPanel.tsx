@@ -68,9 +68,16 @@ export default function CartPanel({
                                 <div className="flex-1 min-w-0 pt-0.5">
                                     <div className="flex justify-between items-start">
                                         <h4 className="font-bold text-slate-800 truncate pr-2 text-sm">{item.name}</h4>
-                                        <span className="font-mono text-slate-800 font-bold text-sm tracking-wide">
-                                            {formatRupiah((item.price * item.qty) - item.discount).replace(",00", "")}
-                                        </span>
+                                        <div className="text-right">
+                                            <span className="font-mono text-slate-800 font-bold text-sm tracking-wide">
+                                                {formatRupiah((item.price * item.qty) - item.discount).replace(",00", "")}
+                                            </span>
+                                            {item.discount > 0 && (
+                                                <div className="text-[10px] font-mono text-slate-400 line-through">
+                                                    {formatRupiah(item.price * item.qty).replace(",00", "")}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                     <div className="flex items-center gap-2 mb-2">
                                         <p className="text-slate-400 text-xs font-mono">@{formatRupiah(item.price).replace(",00", "")}</p>
@@ -95,7 +102,7 @@ export default function CartPanel({
                                         </div>
 
                                         <button onClick={onOpenApprovalModal} className="px-2 py-1 rounded-md text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-medium transition-colors border border-indigo-100">
-                                            {item.discount > 0 ? `-${item.discount}` : '% Disc'}
+                                            {item.discount > 0 ? `-${formatRupiah(item.discount)}` : '% Disc'}
                                         </button>
                                     </div>
                                 </div>

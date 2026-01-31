@@ -192,25 +192,17 @@ export default function PaymentModal({
 
                 {/* --- CONTENT AREA --- */}
                 <div className="flex-1 flex flex-col h-full bg-slate-50 md:bg-transparent overflow-hidden">
-
                     {/* Summary Header (Collapsible on Mobile) */}
-                    <div className="bg-white md:bg-transparent p-5 md:p-8 shrink-0 shadow-sm md:shadow-none z-10">
-                        <div className="flex justify-between items-start md:block text-center">
-                            <div className="text-left md:text-center w-full">
-                                <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] md:mb-2">Total Tagihan</p>
-                                <div className="flex items-center justify-between md:justify-center w-full">
-                                    <h2 className="text-3xl md:text-5xl font-mono font-bold text-slate-800 tracking-tighter">
-                                        {formatRupiah(totalDue).replace(",00", "")}
-                                    </h2>
-
-                                    {/* Mobile Only: Show Details Toggle */}
-                                    <button
-                                        onClick={() => setShowDetails(!showDetails)}
-                                        className="md:hidden p-2 text-slate-400"
-                                    >
-                                        {showDetails ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                    </button>
-                                </div>
+                    <div className="bg-white md:bg-transparent p-5 md:p-8 shadow-sm md:shadow-none z-10">
+                        <div className="text-left md:text-center w-full">
+                            <div className="flex items-center justify-between md:justify-center w-full">
+                                {/* Mobile Only: Show Details Toggle */}
+                                <button
+                                    onClick={() => setShowDetails(!showDetails)}
+                                    className="md:hidden p-2 text-slate-400"
+                                >
+                                    {showDetails ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                </button>
                             </div>
                         </div>
 
@@ -224,6 +216,10 @@ export default function PaymentModal({
                                 <div className="flex justify-between">
                                     <span>Pajak (11%)</span>
                                     <span className="font-mono font-bold text-slate-700">{formatRupiah(taxTotal)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span>Total Pembayaran</span>
+                                    <span className="font-mono text-[20px] font-bold text-slate-900">{formatRupiah(totalDue).replace(",00", "")}</span>
                                 </div>
                                 {discountTotal > 0 && (
                                     <div className="flex justify-between text-emerald-600 font-semibold">
@@ -312,17 +308,9 @@ export default function PaymentModal({
 
                             {paymentMethod === 'EWALLET' && (
                                 <div className="flex flex-col h-full animate-in slide-in-from-right-4 duration-300">
-                                    <div className="flex-1 flex flex-col items-center justify-center">
-                                        <div className="w-full rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-                                            <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">QRIS STANDARD</div>
-                                            <div className="mt-6 mx-auto w-48 h-48 md:w-56 md:h-56 rounded-2xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center relative overflow-hidden group">
-                                                <div className="absolute inset-0 opacity-60" style={{ backgroundImage: 'linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px), linear-gradient(0deg, rgba(0,0,0,0.06) 1px, transparent 1px)', backgroundSize: '14px 14px' }}></div>
-                                                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors"></div>
-                                                {/* Placeholder for QR Code Image */}
-                                                <div className="w-20 h-20 rounded-xl bg-white shadow-md flex items-center justify-center text-slate-500 text-xs font-bold ring-4 ring-slate-50">QR CODE</div>
-                                            </div>
-                                            <p className="mt-6 text-sm text-slate-500 px-4 leading-relaxed">Scan kode di atas menggunakan aplikasi e-wallet pembayaran pilihan pelanggan.</p>
-                                        </div>
+                                    <div className="mt-5 mx-auto w-full max-w-64 aspect-square rounded-2xl bg-slate-100 border-2 border-slate-200 flex items-center justify-center relative overflow-hidden group">
+                                        {/* Placeholder for QR Code Image */}
+                                        <div className="w-20 h-20 rounded-xl bg-white shadow-md flex items-center justify-center text-slate-500 text-xs font-bold ring-4 ring-slate-50">QR CODE</div>
                                     </div>
 
                                     <div className="mt-auto py-4">

@@ -29,17 +29,20 @@ class PosCheckoutController extends Controller
         $subtotal = 0.0;
         $discountTotal = 0.0;
         $lineItems = [];
+        $responseItems = [];
 
         foreach ($items as $item) {
             $product = $products->get($item['product_id']);
-            if (!$product) {
+            if (! $product) {
                 return response()->json(['message' => 'Produk tidak ditemukan.'], 422);
             }
 
             $qty = (float) $item['qty'];
             $unitPrice = (float) $product->price;
             $lineSubtotal = $unitPrice * $qty;
-            $discountAmount = (float) ($item['discount_amount'] ?? 0);
+            $discountPerUnit = (float) ($product->discount ?? 0);
+            $discountPerUnit = min($discountPerUnit, $unitPrice);
+            $discountAmount = $discountPerUnit * $qty;
 
             if ($discountAmount > $lineSubtotal) {
                 return response()->json(['message' => 'Diskon melebihi total item.'], 422);
@@ -58,6 +61,18 @@ class PosCheckoutController extends Controller
                 'discount_amount' => $discountAmount,
                 'line_total' => $lineTotal,
             ];
+
+            $priceAfterDiscount = $qty > 0 ? ($lineTotal / $qty) : $lineTotal;
+
+            $responseItems[] = [
+                'product_id' => $product->id,
+                'name' => $product->name,
+                'qty' => $qty,
+                'unit_price' => $unitPrice,
+                'discount_amount' => $discountAmount,
+                'price_after_discount' => $priceAfterDiscount,
+                'line_total' => $lineTotal,
+            ];
         }
 
         $taxTotal = $subtotal * 0.11;
@@ -71,7 +86,7 @@ class PosCheckoutController extends Controller
         $changeTotal = $paymentMethod === 'CASH' ? ($cashReceived - $grandTotal) : 0;
 
         $user = $request->user() ?? \App\Models\User::query()->first();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Kasir tidak ditemukan.'], 422);
         }
 
@@ -89,6 +104,11 @@ class PosCheckoutController extends Controller
                 'change_total' => $changeTotal,
                 'occurred_at' => now(),
                 'synced_at' => now(),
+            ]);
+
+            $invoiceNumber = 'INV-'.now()->format('Ymd').'-'.str_pad((string) $sale->id, 6, '0', STR_PAD_LEFT);
+            $sale->update([
+                'server_invoice_no' => $invoiceNumber,
             ]);
 
             foreach ($lineItems as $lineItem) {
@@ -110,9 +130,11 @@ class PosCheckoutController extends Controller
 
         return response()->json([
             'sale_id' => $sale->id,
+            'invoice_no' => $sale->server_invoice_no,
             'payment' => [
                 'status' => 'CONFIRMED',
             ],
+            'items' => $responseItems,
             'totals' => [
                 'subtotal' => $subtotal,
                 'discount_total' => $discountTotal,
