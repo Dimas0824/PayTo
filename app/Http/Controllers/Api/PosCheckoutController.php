@@ -32,7 +32,7 @@ class PosCheckoutController extends Controller
 
         foreach ($items as $item) {
             $product = $products->get($item['product_id']);
-            if (! $product) {
+            if (!$product) {
                 return response()->json(['message' => 'Produk tidak ditemukan.'], 422);
             }
 
@@ -71,7 +71,7 @@ class PosCheckoutController extends Controller
         $changeTotal = $paymentMethod === 'CASH' ? ($cashReceived - $grandTotal) : 0;
 
         $user = $request->user() ?? \App\Models\User::query()->first();
-        if (! $user) {
+        if (!$user) {
             return response()->json(['message' => 'Kasir tidak ditemukan.'], 422);
         }
 
@@ -88,6 +88,7 @@ class PosCheckoutController extends Controller
                 'paid_total' => $paidTotal,
                 'change_total' => $changeTotal,
                 'occurred_at' => now(),
+                'synced_at' => now(),
             ]);
 
             foreach ($lineItems as $lineItem) {
@@ -101,7 +102,7 @@ class PosCheckoutController extends Controller
                 'method' => $paymentMethod,
                 'amount' => $paidTotal,
                 'reference' => $payload['reference'] ?? null,
-                'status' => 'RECORDED',
+                'status' => 'CONFIRMED',
             ]);
 
             return $sale;
@@ -109,6 +110,9 @@ class PosCheckoutController extends Controller
 
         return response()->json([
             'sale_id' => $sale->id,
+            'payment' => [
+                'status' => 'CONFIRMED',
+            ],
             'totals' => [
                 'subtotal' => $subtotal,
                 'discount_total' => $discountTotal,

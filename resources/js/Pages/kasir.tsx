@@ -29,6 +29,12 @@ export default function PosInterface() {
     const [showApprovalModal, setShowApprovalModal] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [showPaymentSuccessModal, setShowPaymentSuccessModal] = useState(false);
+    const [lastPaymentSummary, setLastPaymentSummary] = useState<{
+        method: 'CASH' | 'EWALLET';
+        total: number;
+        change: number;
+    } | null>(null);
     const [approvalReason, setApprovalReason] = useState("");
     const [supervisorPin, setSupervisorPin] = useState("");
 
@@ -110,7 +116,7 @@ export default function PosInterface() {
         setSyncStatus('syncing');
 
         try {
-            await axios.post('/api/pos/checkout', {
+            const response = await axios.post('/api/pos/checkout', {
                 payment_method: paymentMethod,
                 cash_received: paymentMethod === 'CASH' ? Number(cashReceived) : undefined,
                 items: cart.map((item) => ({
@@ -120,10 +126,22 @@ export default function PosInterface() {
                 })),
             });
 
+            const responseStatus = (response?.data?.status || response?.data?.data?.status || response?.data?.payment?.status || '').toString().toLowerCase();
+            const isPaymentConfirmed = ['confirmed', 'success', 'paid', 'settlement'].includes(responseStatus);
+
             setShowPaymentModal(false);
             setCart([]);
             setCashReceived("");
             setSyncStatus(isOffline ? 'pending' : 'synced');
+
+            if (isPaymentConfirmed) {
+                setLastPaymentSummary({
+                    method: paymentMethod,
+                    total: totalDue,
+                    change,
+                });
+                setShowPaymentSuccessModal(true);
+            }
         } catch (e) {
             setSyncStatus('pending');
         }
@@ -322,6 +340,34 @@ export default function PosInterface() {
                 onClose={() => setShowLogoutModal(false)}
                 onConfirm={confirmLogout}
             />
+
+            <UniversalModal
+                isOpen={showPaymentSuccessModal}
+                title="Pembayaran Berhasil"
+                description="Transaksi telah dikonfirmasi oleh sistem."
+                tone="success"
+                cancelLabel="Tutup"
+                onClose={() => setShowPaymentSuccessModal(false)}
+            >
+                <div className="space-y-2">
+                    <div className="flex justify-between">
+                        <span>Metode</span>
+                        <span className="font-bold text-slate-700">{lastPaymentSummary?.method === 'CASH' ? 'Tunai' : 'QRIS'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span>Total</span>
+                        <span className="font-mono font-bold text-slate-700">{formatRupiah(lastPaymentSummary?.total ?? 0)}</span>
+                    </div>
+                    {lastPaymentSummary?.method === 'CASH' && (
+                        <div className="flex justify-between">
+                            <span>Kembalian</span>
+                            <span className="font-mono font-bold text-emerald-600">
+                                {lastPaymentSummary?.change >= 0 ? formatRupiah(lastPaymentSummary.change).replace(",00", "") : '-'}
+                            </span>
+                        </div>
+                    )}
+                </div>
+            </UniversalModal>
 
             {/* Approval Modal logic remains similar, styled with rounded-[2.5rem] and bg-white/90 backdrop-blur-xl */}
         </div>
