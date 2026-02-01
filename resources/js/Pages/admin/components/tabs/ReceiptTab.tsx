@@ -2,21 +2,89 @@
  * Receipt template editor with live preview.
  */
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Save, Settings } from 'lucide-react';
 
-type ReceiptTabProps = {
-    receiptHeader: string;
-    receiptFooter: string;
-    onChangeHeader: (value: string) => void;
-    onChangeFooter: (value: string) => void;
-};
+export default function ReceiptTab() {
+    const [receiptHeader, setReceiptHeader] = useState('');
+    const [receiptFooter, setReceiptFooter] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-export default function ReceiptTab({ receiptHeader, receiptFooter, onChangeHeader, onChangeFooter }: ReceiptTabProps) {
+    useEffect(() => {
+        let isActive = true;
+
+        const fetchSettings = async () => {
+            try {
+                const response = await axios.get('/api/admin/receipt-settings');
+                if (!isActive) {
+                    return;
+                }
+                const data = response.data?.data ?? {};
+                setReceiptHeader(data.header ?? '');
+                setReceiptFooter(data.footer ?? '');
+            } catch (error) {
+                if (!isActive) {
+                    return;
+                }
+                setErrorMessage('Gagal memuat pengaturan struk.');
+            } finally {
+                if (isActive) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        fetchSettings();
+
+        return () => {
+            isActive = false;
+        };
+    }, []);
+
+    const handleSave = async () => {
+        if (isSaving) {
+            return;
+        }
+
+        setIsSaving(true);
+        setErrorMessage(null);
+        setSuccessMessage(null);
+
+        try {
+            const response = await axios.put('/api/admin/receipt-settings', {
+                header: receiptHeader,
+                footer: receiptFooter,
+            });
+            const data = response.data?.data ?? {};
+            setReceiptHeader(data.header ?? receiptHeader);
+            setReceiptFooter(data.footer ?? receiptFooter);
+            setSuccessMessage('Pengaturan struk berhasil disimpan.');
+        } catch (error) {
+            setErrorMessage('Gagal menyimpan pengaturan struk.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 animate-in slide-in-from-bottom-4 duration-500">
             <div className="space-y-6">
-                <div className="bg-white/40 backdrop-blur-xl border border-white/60 rounded-[2rem] p-6 shadow-sm">
+                {errorMessage ? (
+                    <div className="bg-rose-50 text-rose-600 border border-rose-200 rounded-2xl px-4 py-3 text-sm font-semibold">
+                        {errorMessage}
+                    </div>
+                ) : null}
+                {successMessage ? (
+                    <div className="bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-2xl px-4 py-3 text-sm font-semibold">
+                        {successMessage}
+                    </div>
+                ) : null}
+
+                <div className="bg-white/40 backdrop-blur-xl border border-white/60 rounded-4xl p-6 shadow-sm">
                     <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <Settings size={20} className="text-slate-400" /> Konfigurasi Template
                     </h3>
@@ -27,7 +95,7 @@ export default function ReceiptTab({ receiptHeader, receiptFooter, onChangeHeade
                             <textarea
                                 rows={4}
                                 value={receiptHeader}
-                                onChange={(e) => onChangeHeader(e.target.value)}
+                                onChange={(e) => setReceiptHeader(e.target.value)}
                                 className="w-full p-4 bg-white/60 border border-white/60 rounded-2xl text-sm font-mono focus:ring-2 focus:ring-indigo-200 outline-none"
                                 placeholder="Nama Toko, Alamat, Telp..."
                             />
@@ -39,24 +107,28 @@ export default function ReceiptTab({ receiptHeader, receiptFooter, onChangeHeade
                             <textarea
                                 rows={3}
                                 value={receiptFooter}
-                                onChange={(e) => onChangeFooter(e.target.value)}
+                                onChange={(e) => setReceiptFooter(e.target.value)}
                                 className="w-full p-4 bg-white/60 border border-white/60 rounded-2xl text-sm font-mono focus:ring-2 focus:ring-indigo-200 outline-none"
                                 placeholder="Ucapan terima kasih, info wifi, sosmed..."
                             />
                         </div>
 
-                        <button className="flex items-center justify-center gap-2 w-full py-4 bg-slate-800 text-white rounded-2xl font-bold shadow-lg shadow-slate-300 hover:bg-slate-900 transition-all">
-                            <Save size={18} /> Simpan Template
+                        <button
+                            onClick={handleSave}
+                            disabled={isSaving || isLoading}
+                            className="flex items-center justify-center gap-2 w-full py-4 bg-slate-800 text-white rounded-2xl font-bold shadow-lg shadow-slate-300 hover:bg-slate-900 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                            <Save size={18} /> {isSaving ? 'Menyimpan...' : 'Simpan Template'}
                         </button>
                     </div>
                 </div>
             </div>
 
             <div className="flex justify-center">
-                <div className="w-full max-w-[360px] bg-white p-6 rounded-none shadow-2xl relative font-mono text-xs text-slate-800 border-t-8 border-slate-200">
+                <div className="w-full max-w-90 bg-white p-6 rounded-none shadow-2xl relative font-mono text-xs text-slate-800 border-t-8 border-slate-200">
                     <div className="absolute top-0 left-0 w-full h-2 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCA0IiB3aWR0aD0iMjAiIGhlaWdodD0iNCI+PHBhdGggZD0iTTAgNGw1LTRsNSA0bDUtNGw1IDR2LTRoLTIweiIgZmlsbD0iI2UzZTNiOCIvPjwvc3ZnPg==')] opacity-50"></div>
 
-                    <div className="text-center mb-4 whitespace-pre-wrap leading-tight break-words">
+                    <div className="text-center mb-4 whitespace-pre-wrap leading-tight wrap-break-word">
                         {receiptHeader}
                     </div>
 
@@ -79,7 +151,7 @@ export default function ReceiptTab({ receiptHeader, receiptFooter, onChangeHeade
                     <div className="flex justify-between text-lg font-bold mt-2"><span>TOTAL</span><span>44.000</span></div>
                     <div className="border-b border-dashed border-slate-300 my-2"></div>
 
-                    <div className="text-center mt-4 whitespace-pre-wrap leading-tight text-slate-600 break-words">
+                    <div className="text-center mt-4 whitespace-pre-wrap leading-tight text-slate-600 wrap-break-word">
                         {receiptFooter}
                     </div>
 
