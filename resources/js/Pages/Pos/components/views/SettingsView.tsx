@@ -142,8 +142,7 @@ export default function SettingsView() {
                 </section>
 
                 <div className="text-center pt-4 pb-8">
-                    <div className="text-xs font-bold text-slate-400">PayTo v1.0.1 (Build 20260120)</div>
-                    <div className="text-[10px] text-slate-300 mt-1">Licensed to Toko Cabang Pusat</div>
+                    <div className="text-xs font-bold text-slate-400">PayTo v1.0.1</div>
                 </div>
             </div>
         </div>

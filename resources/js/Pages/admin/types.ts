@@ -37,11 +37,15 @@ export type StaffMember = {
 export type Product = {
     id: number;
     name: string;
-    sku: string;
-    category: string;
+    sku: string | null;
+    barcode?: string | null;
     price: number;
-    stock: number;
     discount: number;
+    price_after_discount: number;
+    cost?: number | null;
+    uom: string;
+    stock: number;
+    is_active: boolean;
     status: 'ACTIVE' | 'INACTIVE';
     image?: string;
 };

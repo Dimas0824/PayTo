@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, LayoutGrid, LogOut, Settings, Star, User, Wifi, WifiOff, Zap } from 'lucide-react';
+import { Clock, LayoutGrid, LogOut, Settings, Star, User, Wifi, WifiOff } from 'lucide-react';
 
 type SidebarProps = {
     activeView: 'menu' | 'history' | 'favorites' | 'profile' | 'settings';
@@ -24,8 +24,8 @@ export default function Sidebar({
 }: SidebarProps) {
     return (
         <nav className="w-20 my-4 ml-4 flex flex-col items-center py-6 gap-8 z-30 relative bg-white/40 backdrop-blur-xl border border-white/50 shadow-2xl shadow-indigo-100/20 rounded-[2.5rem]">
-            <div className="w-10 h-10 bg-linear-to-tr from-indigo-600 to-violet-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-300/50">
-                <Zap size={20} fill="currentColor" />
+            <div className="w-10 h-10 bg-linear-to-tr from-indigo-300 to-violet-200 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-300/50">
+                <img src="../storage/logs-removed.png" alt="PayTo Logo" />
             </div>
 
             <div className="flex flex-col gap-6 w-full px-2 items-center">
@@ -82,13 +82,7 @@ export default function Sidebar({
 
                     {showUserMenu && (
                         <div className="absolute bottom-0 left-full ml-3 w-64 bg-white/80 backdrop-blur-xl border border-white/60 rounded-2xl shadow-2xl p-2 flex flex-col gap-1 z-50 animate-in slide-in-from-left-2 duration-200">
-                            <div className="px-3 py-3 mb-1 bg-linear-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100/50">
-                                <p className="font-bold text-sm text-slate-800">Budi Santoso</p>
-                                <div className="flex items-center gap-1.5 mt-0.5">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                    <p className="text-xs text-slate-500">Kasir • Shift Pagi</p>
-                                </div>
-                            </div>
+
                             <button
                                 onClick={() => onNavigate('profile')}
                                 className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-600 hover:bg-white hover:text-indigo-600 rounded-xl transition-colors text-left"

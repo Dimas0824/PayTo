@@ -9,8 +9,8 @@ type StatCardProps = {
     title: string;
     value: string;
     subtext: string;
-    trend: 'up' | 'down';
-    trendVal: string;
+    trend?: 'up' | 'down';
+    trendVal?: string;
 };
 
 export default function StatCard({ title, value, subtext, trend, trendVal }: StatCardProps) {
@@ -21,14 +21,20 @@ export default function StatCard({ title, value, subtext, trend, trendVal }: Sta
                     <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">{title}</p>
                     <h3 className="text-3xl font-bold text-slate-800 mt-1">{value}</h3>
                 </div>
-                <div className={`p-2 rounded-xl ${trend === 'up' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
-                    {trend === 'up' ? <ArrowUpRight size={20} /> : <ArrowDownRight size={20} />}
-                </div>
+                {trend ? (
+                    <div
+                        className={`p-2 rounded-xl ${trend === 'up' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}
+                    >
+                        {trend === 'up' ? <ArrowUpRight size={20} /> : <ArrowDownRight size={20} />}
+                    </div>
+                ) : null}
             </div>
             <div className="flex items-center gap-2 text-xs">
-                <span className={`font-bold ${trend === 'up' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                    {trend === 'up' ? '+' : ''}{trendVal}
-                </span>
+                {trend && trendVal ? (
+                    <span className={`font-bold ${trend === 'up' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {trend === 'up' ? '+' : ''}{trendVal}
+                    </span>
+                ) : null}
                 <span className="text-slate-400">{subtext}</span>
             </div>
         </div>
