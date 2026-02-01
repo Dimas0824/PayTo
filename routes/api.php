@@ -9,6 +9,15 @@ Route::post('/admin/products', [\App\Http\Controllers\Api\ProductQueryController
 Route::get('/admin/products/{product}', [\App\Http\Controllers\Api\ProductQueryController::class, 'show']);
 Route::put('/admin/products/{product}', [\App\Http\Controllers\Api\ProductQueryController::class, 'update']);
 Route::delete('/admin/products/{product}', [\App\Http\Controllers\Api\ProductQueryController::class, 'destroy']);
+Route::get('/admin/inventory/recommendations', [\App\Http\Controllers\Api\InventoryRecommendationController::class, 'index']);
+Route::get('/admin/receipt-settings', [\App\Http\Controllers\Api\ReceiptSettingsController::class, 'index']);
+Route::put('/admin/receipt-settings', [\App\Http\Controllers\Api\ReceiptSettingsController::class, 'update']);
+Route::get('/admin/staff', [\App\Http\Controllers\Api\StaffManagementController::class, 'index']);
+Route::post('/admin/staff', [\App\Http\Controllers\Api\StaffManagementController::class, 'store']);
+Route::get('/admin/staff/{user}', [\App\Http\Controllers\Api\StaffManagementController::class, 'show']);
+Route::put('/admin/staff/{user}', [\App\Http\Controllers\Api\StaffManagementController::class, 'update']);
+Route::delete('/admin/staff/{user}', [\App\Http\Controllers\Api\StaffManagementController::class, 'destroy']);
+Route::post('/admin/staff/{user}/reset-pin', [\App\Http\Controllers\Api\StaffManagementController::class, 'resetPin']);
 Route::get('/pos/products', [\App\Http\Controllers\Api\PosApiController::class, 'products']);
 Route::get('/pos/history', [\App\Http\Controllers\Api\PosApiController::class, 'history']);
 Route::get('/pos/profile', [\App\Http\Controllers\Api\PosApiController::class, 'profile']);

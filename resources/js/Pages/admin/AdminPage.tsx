@@ -5,7 +5,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { router } from '@inertiajs/react';
 import type { AdminTab } from './types';
-import { ADMIN_PROFILE, APPROVAL_LOGS, INVENTORY_DATA, NOTIFICATIONS_DATA, STAFF_DATA } from './data';
+import { ADMIN_PROFILE, APPROVAL_LOGS, NOTIFICATIONS_DATA } from './data';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import DashboardTab from './components/tabs/DashboardTab';
@@ -21,8 +21,6 @@ import UniversalModal from '../../Components/UniversalModal';
 export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<AdminTab>('DASHBOARD');
 
-    const [receiptHeader, setReceiptHeader] = useState("TOKO CABANG PUSAT\nJl. Sudirman No. 45, Jakarta");
-    const [receiptFooter, setReceiptFooter] = useState("Terima kasih atas kunjungan Anda\nFollow IG: @tokokopi");
     const [storeName, setStoreName] = useState("Toko Cabang Pusat");
     const [discountLimit, setDiscountLimit] = useState(20);
     const [allowNegativeStock, setAllowNegativeStock] = useState(false);
@@ -139,17 +137,10 @@ export default function AdminPage() {
                     {activeTab === 'DASHBOARD' && <DashboardTab />}
                     {activeTab === 'PROFILE' && <ProfileTab profile={ADMIN_PROFILE} />}
                     {activeTab === 'PRODUCTS' && <ProductsTab />}
-                    {activeTab === 'INVENTORY' && <InventoryTab items={INVENTORY_DATA} />}
-                    {activeTab === 'RECEIPT' && (
-                        <ReceiptTab
-                            receiptHeader={receiptHeader}
-                            receiptFooter={receiptFooter}
-                            onChangeHeader={setReceiptHeader}
-                            onChangeFooter={setReceiptFooter}
-                        />
-                    )}
+                    {activeTab === 'INVENTORY' && <InventoryTab />}
+                    {activeTab === 'RECEIPT' && <ReceiptTab />}
                     {activeTab === 'APPROVALS' && <ApprovalsTab logs={APPROVAL_LOGS} />}
-                    {activeTab === 'USERS' && <UsersTab staff={STAFF_DATA} />}
+                    {activeTab === 'USERS' && <UsersTab />}
                     {activeTab === 'SETTINGS' && (
                         <SettingsTab
                             storeName={storeName}

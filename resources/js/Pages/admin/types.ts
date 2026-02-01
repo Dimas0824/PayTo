@@ -7,7 +7,7 @@ export type AdminTab = 'DASHBOARD' | 'INVENTORY' | 'RECEIPT' | 'APPROVALS' | 'US
 export type InventoryRecommendation = {
     id: number;
     productName: string;
-    sku: string;
+    sku: string | null;
     stock: number;
     avgSales7d: number;
     leadTime: number;
@@ -31,6 +31,7 @@ export type StaffMember = {
     role: 'SUPERVISOR' | 'CASHIER';
     username: string;
     status: 'ACTIVE' | 'INACTIVE';
+    is_active: boolean;
     lastLogin: string;
 };
 

@@ -9,6 +9,8 @@ class AppSetting extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'app_settings';
 
     protected $fillable = [
