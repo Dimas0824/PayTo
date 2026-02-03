@@ -13,7 +13,7 @@ import ProfileView from './Pos/components/views/ProfileView';
 import SettingsView from './Pos/components/views/SettingsView';
 import UniversalModal from '../Components/UniversalModal';
 import { CATEGORIES, QUICK_CASH_AMOUNTS } from './Pos/data';
-import type { CartItem, Product } from './Pos/types';
+import type { CartItem, Product, TransactionHistory } from './Pos/types';
 
 export default function PosInterface() {
     // authentication and role will be validated by the backend header/profile controller
@@ -39,6 +39,13 @@ export default function PosInterface() {
     } | null>(null);
     const [approvalReason, setApprovalReason] = useState("");
     const [supervisorPin, setSupervisorPin] = useState("");
+    const [showRefundModal, setShowRefundModal] = useState(false);
+    const [refundTarget, setRefundTarget] = useState<TransactionHistory | null>(null);
+    const [refundReason, setRefundReason] = useState('');
+    const [refundQuantities, setRefundQuantities] = useState<Record<string, string>>({});
+    const [refundError, setRefundError] = useState<string | null>(null);
+    const [refundSubmitting, setRefundSubmitting] = useState(false);
+    const [refundSuccess, setRefundSuccess] = useState<{ message: string; total: number } | null>(null);
 
     // Payment State
     const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'EWALLET'>('CASH');
@@ -86,6 +93,15 @@ export default function PosInterface() {
     const taxTotal = (subtotal - totalDiscount) * 0.11;
     const totalDue = grandTotal + taxTotal;
     const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+
+    const hasRefundSelection = refundTarget
+        ? refundTarget.itemsDetail.some(item => Number(refundQuantities[item.id] || 0) > 0)
+        : false;
+    const canSubmitRefund = Boolean(
+        refundTarget
+        && hasRefundSelection
+        && refundReason.trim().length >= 10
+    );
 
     const change = paymentMethod === 'CASH' && cashReceived
         ? Number(cashReceived) - totalDue
@@ -188,6 +204,90 @@ export default function PosInterface() {
         }
     };
 
+    const refreshHistory = async () => {
+        try {
+            const res = await axios.get('/api/pos/history', {
+                params: {
+                    page: historyPage,
+                    per_page: historyMeta.perPage,
+                    start_date: historyFilters.startDate || undefined,
+                    end_date: historyFilters.endDate || undefined,
+                },
+            });
+            setHistoryData(res.data.data || []);
+            const meta = res.data.meta || {};
+            setHistoryMeta({
+                currentPage: Number(meta.current_page ?? historyPage),
+                perPage: Number(meta.per_page ?? historyMeta.perPage),
+                total: Number(meta.total ?? 0),
+                lastPage: Number(meta.last_page ?? 1),
+            });
+        } catch (e) {
+            // silent
+        }
+    };
+
+    const openRefundModal = (tx: TransactionHistory) => {
+        const initialQuantities = tx.itemsDetail.reduce<Record<string, string>>((acc, item) => {
+            acc[item.id] = '';
+            return acc;
+        }, {});
+
+        setRefundTarget(tx);
+        setRefundQuantities(initialQuantities);
+        setRefundReason('');
+        setRefundError(null);
+        setShowRefundModal(true);
+    };
+
+    const submitRefund = async () => {
+        if (!refundTarget) return;
+
+        const items = refundTarget.itemsDetail
+            .map(item => ({
+                sale_item_id: Number(item.id),
+                qty: Number(refundQuantities[item.id] || 0),
+                maxQty: item.refundableQty,
+            }))
+            .filter(item => item.qty > 0);
+
+        if (items.length === 0) {
+            setRefundError('Pilih minimal satu item untuk refund.');
+            return;
+        }
+
+        if (!refundReason.trim()) {
+            setRefundError('Alasan refund wajib diisi.');
+            return;
+        }
+
+        setRefundSubmitting(true);
+        setRefundError(null);
+
+        try {
+            const response = await axios.post('/api/pos/refunds', {
+                sale_id: refundTarget.saleId,
+                reason: refundReason.trim(),
+                items: items.map(item => ({
+                    sale_item_id: item.sale_item_id,
+                    qty: item.qty,
+                })),
+            });
+
+            const message = response?.data?.message || 'Refund berhasil diproses.';
+            const totalAmount = Number(response?.data?.data?.total_amount ?? 0);
+
+            setShowRefundModal(false);
+            setRefundSuccess({ message, total: totalAmount });
+            await refreshHistory();
+        } catch (e: any) {
+            const errorMessage = e?.response?.data?.message || 'Refund gagal diproses.';
+            setRefundError(errorMessage);
+        } finally {
+            setRefundSubmitting(false);
+        }
+    };
+
     const handleLogout = () => {
         setShowUserMenu(false);
         setShowLogoutModal(true);
@@ -277,32 +377,8 @@ export default function PosInterface() {
     useEffect(() => {
         let mounted = true;
 
-        async function fetchHistory() {
-            try {
-                const res = await axios.get('/api/pos/history', {
-                    params: {
-                        page: historyPage,
-                        per_page: historyMeta.perPage,
-                        start_date: historyFilters.startDate || undefined,
-                        end_date: historyFilters.endDate || undefined,
-                    },
-                });
-                if (!mounted) return;
-                setHistoryData(res.data.data || []);
-                const meta = res.data.meta || {};
-                setHistoryMeta({
-                    currentPage: Number(meta.current_page ?? historyPage),
-                    perPage: Number(meta.per_page ?? historyMeta.perPage),
-                    total: Number(meta.total ?? 0),
-                    lastPage: Number(meta.last_page ?? 1),
-                });
-            } catch (e) {
-                // silent
-            }
-        }
-
         if (activeView === 'history') {
-            fetchHistory();
+            refreshHistory();
         }
 
         return () => {
@@ -393,6 +469,7 @@ export default function PosInterface() {
                         page={historyMeta.currentPage}
                         lastPage={historyMeta.lastPage}
                         onPageChange={(page) => setHistoryPage(page)}
+                        onRequestRefund={openRefundModal}
                     />
                 )}
 
@@ -494,6 +571,96 @@ export default function PosInterface() {
                             </span>
                         </div>
                     )}
+                </div>
+            </UniversalModal>
+
+            <UniversalModal
+                isOpen={showRefundModal}
+                title={`Refund ${refundTarget?.invoiceNo ?? ''}`}
+                description="Pilih item dan jumlah refund. Permintaan akan dikirim untuk approval supervisor."
+                tone="warning"
+                confirmLabel="Kirim Permintaan"
+                cancelLabel="Batal"
+                onClose={() => setShowRefundModal(false)}
+                onConfirm={submitRefund}
+                isConfirmDisabled={!canSubmitRefund}
+                isLoading={refundSubmitting}
+            >
+                <div className="space-y-4">
+                    {refundError && (
+                        <div className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600">
+                            {refundError}
+                        </div>
+                    )}
+                    <div className="space-y-3">
+                        {refundTarget?.itemsDetail.map((item) => (
+                            <div key={item.id} className="flex flex-col gap-2 rounded-xl border border-slate-200/70 bg-white/80 p-3">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-800">{item.name}</p>
+                                        <p className="text-xs text-slate-500">
+                                            Sisa {item.refundableQty} × {formatRupiah(item.refundUnitPrice).replace(',00', '')}
+                                        </p>
+                                    </div>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        max={item.refundableQty}
+                                        step="0.001"
+                                        value={refundQuantities[item.id] ?? ''}
+                                        onChange={(event) => {
+                                            const rawValue = event.target.value;
+                                            const numeric = Number(rawValue);
+
+                                            if (Number.isNaN(numeric)) {
+                                                setRefundQuantities(prev => ({ ...prev, [item.id]: '' }));
+                                                return;
+                                            }
+
+                                            const clamped = Math.max(0, Math.min(numeric, item.refundableQty));
+                                            setRefundQuantities(prev => ({ ...prev, [item.id]: clamped ? clamped.toString() : '' }));
+                                        }}
+                                        className="w-28 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
+                                        placeholder="0"
+                                        disabled={item.refundableQty <= 0}
+                                    />
+                                </div>
+                                {item.refundedQty > 0 && (
+                                    <p className="text-[10px] text-amber-600">
+                                        Sudah direfund: {item.refundedQty}
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="space-y-2">
+                        <div>
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Alasan Refund</label>
+                            <textarea
+                                value={refundReason}
+                                onChange={(event) => setRefundReason(event.target.value)}
+                                className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                                rows={3}
+                                placeholder="Tuliskan alasan refund (min. 10 karakter)"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </UniversalModal>
+
+            <UniversalModal
+                isOpen={Boolean(refundSuccess)}
+                title="Permintaan Refund Terkirim"
+                description={refundSuccess?.message}
+                tone="success"
+                cancelLabel="Tutup"
+                onClose={() => setRefundSuccess(null)}
+            >
+                <div className="flex items-center justify-between">
+                    <span>Total refund</span>
+                    <span className="font-mono font-bold text-emerald-600">
+                        {formatRupiah(refundSuccess?.total ?? 0).replace(',00', '')}
+                    </span>
                 </div>
             </UniversalModal>
 

@@ -12,6 +12,9 @@ Route::delete('/admin/products/{product}', [\App\Http\Controllers\Api\ProductQue
 Route::get('/admin/inventory/recommendations', [\App\Http\Controllers\Api\InventoryRecommendationController::class, 'index']);
 Route::get('/admin/receipt-settings', [\App\Http\Controllers\Api\ReceiptSettingsController::class, 'index']);
 Route::put('/admin/receipt-settings', [\App\Http\Controllers\Api\ReceiptSettingsController::class, 'update']);
+Route::get('/admin/approvals', [\App\Http\Controllers\Api\ApprovalController::class, 'index']);
+Route::post('/admin/approvals/{approval}/approve', [\App\Http\Controllers\Api\ApprovalController::class, 'approve']);
+Route::post('/admin/approvals/{approval}/reject', [\App\Http\Controllers\Api\ApprovalController::class, 'reject']);
 Route::get('/admin/staff', [\App\Http\Controllers\Api\StaffManagementController::class, 'index']);
 Route::post('/admin/staff', [\App\Http\Controllers\Api\StaffManagementController::class, 'store']);
 Route::get('/admin/staff/{user}', [\App\Http\Controllers\Api\StaffManagementController::class, 'show']);
@@ -22,6 +25,7 @@ Route::get('/pos/products', [\App\Http\Controllers\Api\PosApiController::class, 
 Route::get('/pos/history', [\App\Http\Controllers\Api\PosApiController::class, 'history']);
 Route::get('/pos/profile', [\App\Http\Controllers\Api\PosApiController::class, 'profile']);
 Route::post('/pos/checkout', [\App\Http\Controllers\Api\PosCheckoutController::class, 'store']);
+Route::post('/pos/refunds', [\App\Http\Controllers\Api\PosRefundController::class, 'store']);
 Route::post('/pos/logout', [\App\Http\Controllers\Auth\PosLogoutController::class, 'store']);
 Route::get('/pos/settings', [\App\Http\Controllers\Api\PosSettingsController::class, 'index']);
 Route::post('/pos/settings/printer', [\App\Http\Controllers\Api\PosSettingsController::class, 'updatePrinter']);

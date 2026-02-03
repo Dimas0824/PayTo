@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Pos;
 
+use App\Models\Approval;
+use App\Models\AppSetting;
 use App\Models\Sale;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Carbon;
 
 class HistoryQueryController
@@ -48,9 +51,10 @@ class HistoryQueryController
     /**
      * @param  array{userId?: int|null, startDate?: string|null, endDate?: string|null}  $filters
      */
-    protected function buildQuery(array $filters = []): Builder
+    protected function buildQuery(array $filters = []): Builder|QueryBuilder
     {
-        $query = Sale::with(['items', 'payments'])
+        $query = Sale::query()
+            ->with(['items', 'payments', 'refunds.items'])
             ->orderByDesc('occurred_at');
 
         if (! empty($filters['userId'])) {
@@ -78,17 +82,47 @@ class HistoryQueryController
     protected function mapSale(Sale $sale): array
     {
         $payment = $sale->payments->first();
+        $refundItems = $sale->refunds->flatMap(fn ($refund) => $refund->items);
+        $refundedQtyMap = $refundItems
+            ->groupBy('sale_item_id')
+            ->map(fn ($items) => (float) $items->sum('qty'))
+            ->all();
+        $refundedTotal = (float) $sale->refunds->sum('total_amount');
+        $pendingRefundApprovals = Approval::query()
+            ->where('sale_id', $sale->id)
+            ->where('action', 'REFUND')
+            ->where('status', 'PENDING')
+            ->get();
+        $pendingRefundTotal = (float) $pendingRefundApprovals->sum(fn (Approval $approval) => (float) data_get($approval->payload_json, 'total', 0));
+        $hasPendingRefundApproval = $pendingRefundApprovals->isNotEmpty();
+        $windowDays = $this->refundWindowDays();
+        $occurredAt = $sale->occurred_at ?? $sale->created_at;
+        $refundDeadline = $occurredAt
+            ? Carbon::parse($occurredAt)->addDays($windowDays)->endOfDay()
+            : null;
+        $refundableRemaining = max(0, (float) $sale->grand_total - $refundedTotal);
+        $canRefund = $sale->status === 'PAID'
+            && $refundDeadline
+            && now()->lessThanOrEqualTo($refundDeadline)
+            && $refundableRemaining > 0
+            && ! $hasPendingRefundApproval;
+
         $itemsDetail = $sale->items->map(fn ($it) => [
             'id' => (string) $it->id,
             'name' => $it->product_name_snapshot,
-            'qty' => (int) $it->qty,
+            'qty' => (float) $it->qty,
             'price' => (float) $it->unit_price,
+            'lineTotal' => (float) $it->line_total,
+            'refundUnitPrice' => (float) $it->line_total / max((float) $it->qty, 1.0),
+            'refundedQty' => (float) ($refundedQtyMap[$it->id] ?? 0),
+            'refundableQty' => max(0, (float) $it->qty - (float) ($refundedQtyMap[$it->id] ?? 0)),
         ])->all();
 
         $time = $sale->occurred_at ? Carbon::parse($sale->occurred_at)->format('H:i') : '';
 
         return [
             'id' => $sale->local_txn_uuid,
+            'saleId' => $sale->id,
             'invoiceNo' => $sale->server_invoice_no ? $sale->server_invoice_no : '#'.$sale->id,
             'time' => $time,
             'items' => $sale->items->count(),
@@ -99,7 +133,28 @@ class HistoryQueryController
             'paymentMethod' => $payment?->method ?? 'CASH',
             'status' => $sale->status,
             'syncStatus' => $sale->synced_at ? 'SYNCED' : 'PENDING',
+            'refundedTotal' => $refundedTotal,
+            'refundableRemaining' => $refundableRemaining,
+            'pendingRefundTotal' => $pendingRefundTotal,
+            'hasPendingRefundApproval' => $hasPendingRefundApproval,
+            'refundDeadline' => $refundDeadline?->toDateString(),
+            'canRefund' => $canRefund,
             'itemsDetail' => $itemsDetail,
         ];
+    }
+
+    private function refundWindowDays(): int
+    {
+        $setting = AppSetting::query()->where('key', 'refund.window_days')->first();
+        $value = $setting?->value;
+        $days = 2;
+
+        if (is_array($value)) {
+            $days = (int) ($value['days'] ?? $value['value'] ?? $value[0] ?? $days);
+        } elseif (is_numeric($value)) {
+            $days = (int) $value;
+        }
+
+        return max(0, $days);
     }
 }

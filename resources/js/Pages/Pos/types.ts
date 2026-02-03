@@ -31,10 +31,15 @@ export type TransactionItem = {
     name: string;
     qty: number;
     price: number;
+    lineTotal: number;
+    refundUnitPrice: number;
+    refundedQty: number;
+    refundableQty: number;
 };
 
 export type TransactionHistory = {
     id: string;
+    saleId: number;
     invoiceNo: string;
     time: string;
     status: 'PAID' | 'VOID';
@@ -45,6 +50,12 @@ export type TransactionHistory = {
     total: number;
     syncStatus: 'SYNCED' | 'PENDING';
     items: number;
+    refundedTotal: number;
+    refundableRemaining: number;
+    pendingRefundTotal: number;
+    hasPendingRefundApproval: boolean;
+    refundDeadline?: string | null;
+    canRefund?: boolean;
 
     itemsDetail: TransactionItem[];
 };

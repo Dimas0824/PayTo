@@ -22,6 +22,7 @@ type HistoryViewProps = {
     page: number;
     lastPage: number;
     onPageChange: (page: number) => void;
+    onRequestRefund: (tx: TransactionHistory) => void;
 };
 
 export default function HistoryView({
@@ -35,6 +36,7 @@ export default function HistoryView({
     page,
     lastPage,
     onPageChange,
+    onRequestRefund,
 }: HistoryViewProps) {
     const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -126,11 +128,11 @@ export default function HistoryView({
                                         </div>
 
                                         {tx.syncStatus === 'SYNCED' ? (
-                                            <span className="text-[10px] font-bold text-emerald-600 flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 mt-1 inline-flex">
+                                            <span className="text-[10px] font-bold text-emerald-600 inline-flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 mt-1">
                                                 <CheckCircle size={10} /> Terkirim
                                             </span>
                                         ) : (
-                                            <span className="text-[10px] font-bold text-amber-600 flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100 mt-1 inline-flex">
+                                            <span className="text-[10px] font-bold text-amber-600 inline-flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100 mt-1">
                                                 <RefreshCw size={10} className="animate-spin" /> Menunggu Sync
                                             </span>
                                         )}
@@ -146,7 +148,7 @@ export default function HistoryView({
                             {/* DETAIL */}
                             <div
                                 className={`overflow-hidden transition-all duration-300
-    ${isOpen ? 'max-h-[500px] opacity-100 mt-2' : 'max-h-0 opacity-0'}
+    ${isOpen ? 'max-h-175 opacity-100 mt-2' : 'max-h-0 opacity-0'}
     `}
                             >
                                 <div className="bg-white/60 border border-slate-200/60 rounded-2xl p-4 space-y-4">
@@ -186,12 +188,57 @@ export default function HistoryView({
                                                     </div>
 
                                                     <div className="font-mono font-semibold text-slate-700">
-                                                        {formatRupiah(item.qty * item.price).replace(',00', '')}
+                                                        {formatRupiah(item.lineTotal).replace(',00', '')}
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
+
+                                    {/* REFUND INFO */}
+                                    {(tx.refundedTotal > 0 || tx.canRefund || tx.hasPendingRefundApproval) && (
+                                        <div className="space-y-2 border-t border-slate-200/60 pt-3 text-sm">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-500">Total refund</span>
+                                                <span className="font-mono font-semibold text-slate-700">
+                                                    {formatRupiah(tx.refundedTotal).replace(',00', '')}
+                                                </span>
+                                            </div>
+                                            {tx.hasPendingRefundApproval && (
+                                                <div className="flex justify-between items-center text-amber-600">
+                                                    <span>Menunggu approval</span>
+                                                    <span className="font-mono font-semibold">
+                                                        {formatRupiah(tx.pendingRefundTotal).replace(',00', '')}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-500">Sisa refund</span>
+                                                <span className="font-mono font-semibold text-slate-700">
+                                                    {formatRupiah(tx.refundableRemaining).replace(',00', '')}
+                                                </span>
+                                            </div>
+                                            {tx.refundDeadline && !tx.canRefund && !tx.hasPendingRefundApproval && (
+                                                <p className="text-xs text-amber-600">
+                                                    Masa refund berakhir pada {tx.refundDeadline}.
+                                                </p>
+                                            )}
+                                            {tx.hasPendingRefundApproval && (
+                                                <p className="text-xs text-amber-600">
+                                                    Refund menunggu persetujuan supervisor.
+                                                </p>
+                                            )}
+                                            {tx.canRefund && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => onRequestRefund(tx)}
+                                                    className="mt-2 inline-flex items-center rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-xs font-bold text-indigo-700 hover:bg-indigo-100"
+                                                >
+                                                    Refund
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
 
                                     {/* TOTAL */}
                                     <div className="space-y-2 border-t border-slate-200/60 pt-3 text-sm">

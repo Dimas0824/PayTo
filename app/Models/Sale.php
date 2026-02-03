@@ -48,6 +48,11 @@ class Sale extends Model
         return $this->hasMany(Payment::class, 'sale_id');
     }
 
+    public function refunds(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Refund::class, 'sale_id');
+    }
+
     public function cashier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'cashier_id');

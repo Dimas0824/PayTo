@@ -4,7 +4,6 @@
 
 import type {
     InventoryRecommendation,
-    ApprovalLog,
     StaffMember,
     Product,
     Notification,
@@ -17,12 +16,6 @@ export const INVENTORY_DATA: InventoryRecommendation[] = [
     { id: 3, productName: "Mineral Water", sku: "BV-003", stock: 18, avgSales7d: 15.0, leadTime: 1, reorderPoint: 20, suggestedQty: 2, status: 'WARNING' },
     { id: 4, productName: "Red Velvet Cake", sku: "FD-003", stock: 2, avgSales7d: 4.2, leadTime: 2, reorderPoint: 10, suggestedQty: 8, status: 'CRITICAL' },
     { id: 5, productName: "Beef Burger", sku: "FD-004", stock: 10, avgSales7d: 5.5, leadTime: 3, reorderPoint: 18, suggestedQty: 8, status: 'WARNING' },
-];
-
-export const APPROVAL_LOGS: ApprovalLog[] = [
-    { id: 'LOG-001', action: 'DISCOUNT_OVERRIDE', cashier: 'Budi S.', reason: 'Promo Member VIP', time: '10:45', status: 'APPROVED' },
-    { id: 'LOG-002', action: 'VOID_TRANSACTION', cashier: 'Budi S.', reason: 'Salah input menu', time: '09:12', status: 'APPROVED' },
-    { id: 'LOG-003', action: 'DISCOUNT_OVERRIDE', cashier: 'Siti A.', reason: 'Kompensasi Salah Menu', time: 'Kemarin', status: 'APPROVED' },
 ];
 
 export const STAFF_DATA: StaffMember[] = [

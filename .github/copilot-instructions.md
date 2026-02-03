@@ -31,7 +31,7 @@ The AI MUST always read and respect these files before doing any task:
      - initial system design
      - architectural decisions
      - business flow assumptions
-   - Any implementation MUST stay consistent with this document.
+   - Any implementation MUST stay consistent with this document and Tugas.md. When there is a discrepancy between the two files, then follow the latest task, namely Tugas.md
 
 2. `Tugas.md`
    - Acts as the authoritative task list (TODO / commands).
@@ -40,6 +40,11 @@ The AI MUST always read and respect these files before doing any task:
      - follow tasks strictly as written
      - not invent new business rules
      - not skip steps unless explicitly stated
+
+3. `pos_system.sql`
+    - OPTIONAL: requirement database structure context file.
+    - Read Only when database structure context is needed.
+    - The AI MUST refer to this file or migration files to understand the database structure, relationships, and constraints.
 
 ## Task Execution Rules
 

@@ -1,29 +1,31 @@
 <?php
 
+/**
+ * Represents a refund transaction for a sale, including supervisor approval data.
+ */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Approval extends Model
+class Refund extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'action',
         'sale_id',
         'requested_by',
         'approved_by',
-        'status',
+        'total_amount',
         'reason',
-        'payload_json',
         'occurred_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'payload_json' => 'array',
+            'total_amount' => 'decimal:2',
             'occurred_at' => 'datetime',
         ];
     }
@@ -41,5 +43,10 @@ class Approval extends Model
     public function approver(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(RefundItem::class, 'refund_id');
     }
 }

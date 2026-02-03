@@ -17,12 +17,16 @@ export type InventoryRecommendation = {
 };
 
 export type ApprovalLog = {
-    id: string;
-    action: 'DISCOUNT_OVERRIDE' | 'VOID_TRANSACTION';
+    id: number;
+    action: 'DISCOUNT_OVERRIDE' | 'PRICE_OVERRIDE' | 'VOID' | 'REFUND';
     cashier: string;
     reason: string;
     time: string;
-    status: 'APPROVED';
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    saleInvoice?: string | null;
+    total?: number | null;
+    itemsCount?: number | null;
+    approver?: string | null;
 };
 
 export type StaffMember = {

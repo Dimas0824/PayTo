@@ -5,7 +5,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { router } from '@inertiajs/react';
 import type { AdminTab } from './types';
-import { ADMIN_PROFILE, APPROVAL_LOGS, NOTIFICATIONS_DATA } from './data';
+import { ADMIN_PROFILE, NOTIFICATIONS_DATA } from './data';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import DashboardTab from './components/tabs/DashboardTab';
@@ -139,7 +139,7 @@ export default function AdminPage() {
                     {activeTab === 'PRODUCTS' && <ProductsTab />}
                     {activeTab === 'INVENTORY' && <InventoryTab />}
                     {activeTab === 'RECEIPT' && <ReceiptTab />}
-                    {activeTab === 'APPROVALS' && <ApprovalsTab logs={APPROVAL_LOGS} />}
+                    {activeTab === 'APPROVALS' && <ApprovalsTab />}
                     {activeTab === 'USERS' && <UsersTab />}
                     {activeTab === 'SETTINGS' && (
                         <SettingsTab
