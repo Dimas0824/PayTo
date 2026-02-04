@@ -117,16 +117,16 @@ export default function CartPanel({
                             <span>Subtotal</span>
                             <span className="font-mono text-slate-800 font-bold">{formatRupiah(subtotal)}</span>
                         </div>
-                        <div className="flex justify-between text-slate-500 text-xs font-medium">
-                            <span>Tax (11%)</span>
-                            <span className="font-mono text-slate-800 font-bold">{formatRupiah((subtotal - totalDiscount) * 0.11)}</span>
-                        </div>
                         {totalDiscount > 0 && (
                             <div className="flex justify-between text-emerald-600 text-xs font-bold">
                                 <span>Discount</span>
                                 <span className="font-mono">-{formatRupiah(totalDiscount)}</span>
                             </div>
                         )}
+                        <div className="flex justify-between text-slate-500 text-xs font-medium">
+                            <span>Tax (11%)</span>
+                            <span className="font-mono text-slate-800 font-bold">{formatRupiah((subtotal - totalDiscount) * 0.11)}</span>
+                        </div>
                         <div className="h-px bg-indigo-100/50 my-2"></div>
                         <div className="flex justify-between items-end">
                             <span className="text-slate-600 font-bold text-sm">Total Tagihan</span>

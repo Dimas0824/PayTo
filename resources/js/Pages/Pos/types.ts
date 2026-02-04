@@ -47,6 +47,7 @@ export type TransactionHistory = {
     totalBeforeDiscount: number;
     discountTotal: number;
     totalAfterDiscount: number;
+    taxTotal: number;
     total: number;
     syncStatus: 'SYNCED' | 'PENDING';
     items: number;

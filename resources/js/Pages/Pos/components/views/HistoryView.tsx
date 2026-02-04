@@ -78,6 +78,11 @@ export default function HistoryView({
                 </div>
                 {history.map((tx) => {
                     const isOpen = expandedId === tx.id;
+                    const subtotalValue = tx.totalBeforeDiscount ?? 0;
+                    const discountValue = tx.discountTotal ?? 0;
+                    const totalAfterDiscountValue = tx.totalAfterDiscount ?? 0;
+                    const taxAmount = tx.taxTotal ?? 0;
+                    const totalValue = tx.total ?? 0;
 
                     return (
                         <div key={tx.id} className="group">
@@ -245,21 +250,33 @@ export default function HistoryView({
                                         <div className="flex justify-between items-center">
                                             <span className="text-slate-500">Total sebelum diskon</span>
                                             <span className="font-mono font-semibold text-slate-700">
-                                                {formatRupiah(tx.totalBeforeDiscount).replace(',00', '')}
+                                                {formatRupiah(subtotalValue).replace(',00', '')}
                                             </span>
                                         </div>
-                                        {tx.discountTotal > 0 && (
+                                        {discountValue > 0 && (
                                             <div className="flex justify-between items-center text-emerald-600">
                                                 <span>Diskon</span>
                                                 <span className="font-mono font-semibold">
-                                                    -{formatRupiah(tx.discountTotal).replace(',00', '')}
+                                                    -{formatRupiah(discountValue).replace(',00', '')}
                                                 </span>
                                             </div>
                                         )}
+                                        <div className="flex justify-between items-center text-slate-500">
+                                            <span>Pajak (11%)</span>
+                                            <span className="font-mono font-semibold text-slate-700">
+                                                {formatRupiah(taxAmount).replace(',00', '')}
+                                            </span>
+                                        </div>
                                         <div className="flex justify-between items-center">
                                             <span className="font-bold text-slate-600">Total setelah diskon</span>
                                             <span className="font-mono font-bold text-slate-800">
-                                                {formatRupiah(tx.totalAfterDiscount).replace(',00', '')}
+                                                {formatRupiah(totalAfterDiscountValue).replace(',00', '')}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-slate-500">Total tagihan</span>
+                                            <span className="font-mono font-semibold text-slate-900">
+                                                {formatRupiah(totalValue).replace(',00', '')}
                                             </span>
                                         </div>
                                     </div>

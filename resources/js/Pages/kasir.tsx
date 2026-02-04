@@ -100,7 +100,7 @@ export default function PosInterface() {
     const subtotal = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
     const totalDiscount = cart.reduce((acc, item) => acc + item.discount, 0);
     const grandTotal = subtotal - totalDiscount;
-    const taxTotal = (subtotal - totalDiscount) * 0.11;
+    const taxTotal = subtotal * 0.11;
     const totalDue = grandTotal + taxTotal;
     const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
 

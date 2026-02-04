@@ -28,7 +28,7 @@ class PosRefundController extends Controller
             ->with(['items'])
             ->find($payload['sale_id']);
 
-        if (! $sale) {
+        if (!$sale) {
             return response()->json(['message' => 'Transaksi penjualan tidak ditemukan.'], 404);
         }
 
@@ -37,7 +37,7 @@ class PosRefundController extends Controller
         }
 
         $occurredAt = $sale->occurred_at ?? $sale->created_at;
-        if (! $occurredAt) {
+        if (!$occurredAt) {
             return response()->json(['message' => 'Tanggal transaksi tidak valid.'], 422);
         }
 
@@ -48,7 +48,7 @@ class PosRefundController extends Controller
         }
 
         $cashier = $request->user() ?? User::query()->where('role', 'CASHIER')->orderBy('id')->first();
-        if (! $cashier) {
+        if (!$cashier) {
             return response()->json(['message' => 'Kasir tidak ditemukan.'], 422);
         }
 
@@ -67,7 +67,7 @@ class PosRefundController extends Controller
             ->sum('total_amount');
 
         $refundedQtyMap = RefundItem::query()
-            ->whereHas('refund', fn ($query) => $query->where('sale_id', $sale->id))
+            ->whereHas('refund', fn($query) => $query->where('sale_id', $sale->id))
             ->selectRaw('sale_item_id, SUM(qty) as qty_sum')
             ->groupBy('sale_item_id')
             ->pluck('qty_sum', 'sale_item_id')
@@ -79,7 +79,7 @@ class PosRefundController extends Controller
 
         foreach ($payload['items'] as $item) {
             $saleItem = $itemsById->get((int) $item['sale_item_id']);
-            if (! $saleItem) {
+            if (!$saleItem) {
                 return response()->json(['message' => 'Item transaksi tidak ditemukan.'], 422);
             }
 
@@ -110,7 +110,8 @@ class PosRefundController extends Controller
             return response()->json(['message' => 'Total refund tidak valid.'], 422);
         }
 
-        $remainingRefundable = max(0, (float) $sale->grand_total - $refundedTotal);
+        $netTotal = max(0, (float) $sale->subtotal - (float) $sale->discount_total);
+        $remainingRefundable = max(0, $netTotal - $refundedTotal);
         if ($refundTotal > $remainingRefundable) {
             return response()->json(['message' => 'Total refund melebihi batas pembayaran transaksi.'], 422);
         }
@@ -124,7 +125,7 @@ class PosRefundController extends Controller
                 'status' => 'PENDING',
                 'reason' => $payload['reason'],
                 'payload_json' => [
-                    'items' => collect($refundItems)->map(fn ($item) => [
+                    'items' => collect($refundItems)->map(fn($item) => [
                         'sale_item_id' => $item['sale_item_id'],
                         'product_id' => $item['product_id'],
                         'product_name' => $item['product_name'],
@@ -144,7 +145,7 @@ class PosRefundController extends Controller
                 'approval_id' => $approval->id,
                 'sale_id' => $sale->id,
                 'total_amount' => $refundTotal,
-                'remaining_refundable' => max(0, (float) $sale->grand_total - ($refundedTotal + $refundTotal)),
+                'remaining_refundable' => max(0, $netTotal - ($refundedTotal + $refundTotal)),
                 'status' => $approval->status,
             ],
             'message' => 'Permintaan refund berhasil dikirim untuk approval supervisor.',
