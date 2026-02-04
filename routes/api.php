@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 // POS API endpoints
 Route::get('/admin/dashboard', [\App\Http\Controllers\Api\AdminDashboardController::class, 'index']);
+Route::get('/admin/profile', [\App\Http\Controllers\Api\AdminProfileController::class, 'show']);
 Route::get('/admin/products', [\App\Http\Controllers\Api\ProductQueryController::class, 'index']);
 Route::post('/admin/products', [\App\Http\Controllers\Api\ProductQueryController::class, 'store']);
 Route::get('/admin/products/{product}', [\App\Http\Controllers\Api\ProductQueryController::class, 'show']);

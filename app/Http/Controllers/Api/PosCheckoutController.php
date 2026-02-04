@@ -76,7 +76,10 @@ class PosCheckoutController extends Controller
             ];
         }
 
-        $taxTotal = ($subtotal - $discountTotal) * 0.11;
+        $taxTotal = 0.0;
+        foreach ($lineItems as $lineItem) {
+            $taxTotal += ((float) $lineItem['line_total']) * 0.11;
+        }
         $grandTotal = ($subtotal - $discountTotal) + $taxTotal;
 
         if ($paymentMethod === 'CASH' && $cashReceived < $grandTotal) {

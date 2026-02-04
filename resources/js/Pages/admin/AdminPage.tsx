@@ -4,6 +4,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { router } from '@inertiajs/react';
+import axios from 'axios';
 import type { AdminTab } from './types';
 import { ADMIN_PROFILE, NOTIFICATIONS_DATA } from './mockData';
 import Sidebar from './components/Sidebar';
@@ -30,6 +31,7 @@ export default function AdminPage() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isLargeScreen, setIsLargeScreen] = useState(true);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [adminProfile, setAdminProfile] = useState(ADMIN_PROFILE);
 
     const notificationRef = useRef<HTMLDivElement>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
@@ -69,6 +71,31 @@ export default function AdminPage() {
         window.addEventListener('resize', handleResize);
         return () => {
             window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    useEffect(() => {
+        let isActive = true;
+
+        const fetchProfile = async () => {
+            try {
+                const response = await axios.get('/api/admin/profile');
+                if (!isActive) {
+                    return;
+                }
+                const payload = response.data?.data;
+                if (payload) {
+                    setAdminProfile(payload);
+                }
+            } catch (error) {
+                // fallback to mock profile
+            }
+        };
+
+        fetchProfile();
+
+        return () => {
+            isActive = false;
         };
     }, []);
 
@@ -121,7 +148,7 @@ export default function AdminPage() {
                     notificationRef={notificationRef}
                     userMenuRef={userMenuRef}
                     notifications={NOTIFICATIONS_DATA}
-                    profile={ADMIN_PROFILE}
+                    profile={adminProfile}
                     onNavigateProfile={() => { setActiveTab('PROFILE'); setShowUserMenu(false); }}
                     onNavigateSettings={() => { setActiveTab('SETTINGS'); setShowUserMenu(false); }}
                     onLogout={handleLogout}
@@ -131,7 +158,7 @@ export default function AdminPage() {
 
                 <div className="flex-1 min-w-0 overflow-y-auto px-4 pb-8 custom-scrollbar-light sm:px-6 lg:px-8">
                     {activeTab === 'DASHBOARD' && <DashboardTab />}
-                    {activeTab === 'PROFILE' && <ProfileTab profile={ADMIN_PROFILE} />}
+                    {activeTab === 'PROFILE' && <ProfileTab profile={adminProfile} />}
                     {activeTab === 'PRODUCTS' && <ProductsTab />}
                     {activeTab === 'INVENTORY' && <InventoryTab />}
                     {activeTab === 'RECEIPT' && <ReceiptTab />}
