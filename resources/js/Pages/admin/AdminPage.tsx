@@ -5,7 +5,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { router } from '@inertiajs/react';
 import type { AdminTab } from './types';
-import { ADMIN_PROFILE, NOTIFICATIONS_DATA } from './data';
+import { ADMIN_PROFILE, NOTIFICATIONS_DATA } from './mockData';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import DashboardTab from './components/tabs/DashboardTab';
@@ -37,10 +37,6 @@ export default function AdminPage() {
     useEffect(() => {
         const isLoggedIn = localStorage.getItem('pos_logged_in') === 'true';
         const role = localStorage.getItem('pos_role');
-
-        // if (!isLoggedIn || role !== 'ADMIN') {
-        //     router.visit('/login');
-        // }
     }, []);
 
     useEffect(() => {

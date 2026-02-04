@@ -12,8 +12,18 @@ import HistoryView from './Pos/components/views/HistoryView';
 import ProfileView from './Pos/components/views/ProfileView';
 import SettingsView from './Pos/components/views/SettingsView';
 import UniversalModal from '../Components/UniversalModal';
-import { CATEGORIES, QUICK_CASH_AMOUNTS } from './Pos/data';
+// import { CATEGORIES, QUICK_CASH_AMOUNTS } from './Pos/data';
 import type { CartItem, Product, TransactionHistory } from './Pos/types';
+import { Box, Coffee, LayoutGrid, Utensils } from 'lucide-react';
+
+export const CATEGORIES = [
+    { id: 'All', label: 'All Items', icon: LayoutGrid },
+    { id: 'Minuman', label: 'Drinks', icon: Coffee },
+    { id: 'Makanan', label: 'Foods', icon: Utensils },
+    { id: 'Dessert', label: 'Desserts', icon: Box },
+];
+
+export const QUICK_CASH_AMOUNTS = [20000, 50000, 100000];
 
 export default function PosInterface() {
     // authentication and role will be validated by the backend header/profile controller
@@ -663,8 +673,6 @@ export default function PosInterface() {
                     </span>
                 </div>
             </UniversalModal>
-
-            {/* Approval Modal logic remains similar, styled with rounded-[2.5rem] and bg-white/90 backdrop-blur-xl */}
         </div>
     );
 }
