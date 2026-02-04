@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Pos;
 
+use App\Models\Refund;
 use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -15,21 +16,31 @@ class ProfileQueryController
 
         $today = Carbon::now()->startOfDay();
         $salesQuery = Sale::query()
-            ->when($user?->id, fn ($q) => $q->where('cashier_id', $user->id))
-            ->whereDate('occurred_at', $today);
+            ->when($user?->id, fn($q) => $q->where('cashier_id', $user->id))
+            ->whereDate('occurred_at', $today)
+            ->where('status', 'PAID');
 
-        $transactionsToday = $salesQuery->count();
-        $totalToday = (float) $salesQuery->sum('grand_total');
+        $transactionsToday = (clone $salesQuery)->count();
+
+        $refundsSubquery = Refund::query()
+            ->selectRaw('sale_id, SUM(total_amount) as refund_total')
+            ->groupBy('sale_id');
+
+        $totalToday = (float) (clone $salesQuery)
+            ->leftJoinSub($refundsSubquery, 'refunds', 'refunds.sale_id', '=', 'sales.id')
+            ->selectRaw('SUM(grand_total - COALESCE(refunds.refund_total, 0)) as total')
+            ->value('total');
         $loginAt = $user?->last_login_at ? Carbon::parse($user->last_login_at) : null;
         $logoutAt = $user?->last_logout_at ? Carbon::parse($user->last_logout_at) : null;
         $today = Carbon::today();
-        $workSeconds = $user?->work_date && $user->work_date->equalTo($today)
+        $workDate = $user?->work_date ? Carbon::parse($user->work_date) : null;
+        $workSeconds = $workDate && $workDate->isSameDay($today)
             ? (int) $user->work_seconds
             : 0;
 
         $durationText = '—';
         if ($loginAt && $loginAt->isSameDay($today)) {
-            $isActiveSession = ! $logoutAt || $logoutAt->lessThan($loginAt);
+            $isActiveSession = !$logoutAt || $logoutAt->lessThan($loginAt);
             if ($isActiveSession) {
                 $workSeconds += $loginAt->diffInSeconds(Carbon::now());
             }
