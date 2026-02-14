@@ -1,21 +1,44 @@
 import React from 'react';
-import { ChevronLeft, Search } from 'lucide-react';
+import { ChevronLeft, Menu, Search } from 'lucide-react';
 
 type HeaderBarProps = {
     activeView: 'menu' | 'history' | 'favorites' | 'profile' | 'settings';
     searchQuery: string;
     onSearchChange: (value: string) => void;
     onBack: () => void;
+    onToggleSidebar?: () => void;
+    showSidebarToggle?: boolean;
     searchInputRef: React.RefObject<HTMLInputElement | null>;
     profile?: { displayName?: string };
     displayName?: string;
 };
 
-export default function HeaderBar({ activeView, searchQuery, onSearchChange, onBack, searchInputRef, profile, displayName }: HeaderBarProps) {
+export default function HeaderBar({
+    activeView,
+    searchQuery,
+    onSearchChange,
+    onBack,
+    onToggleSidebar,
+    showSidebarToggle = false,
+    searchInputRef,
+    profile,
+    displayName,
+}: HeaderBarProps) {
     const name = profile?.displayName ?? displayName ?? 'Kasir';
     return (
-        <header className="flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3">
+        <header className="flex flex-col gap-3 shrink-0 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3 sm:items-center">
+                {showSidebarToggle && (
+                    <button
+                        type="button"
+                        onClick={onToggleSidebar}
+                        className="w-10 h-10 rounded-xl bg-white/50 hover:bg-white text-slate-500 flex items-center justify-center transition-all shadow-sm lg:hidden"
+                        aria-label="Buka menu navigasi"
+                    >
+                        <Menu size={20} />
+                    </button>
+                )}
+
                 {activeView !== 'menu' && (
                     <button
                         onClick={onBack}
@@ -26,7 +49,7 @@ export default function HeaderBar({ activeView, searchQuery, onSearchChange, onB
                 )}
 
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
+                    <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
                         {activeView === 'menu' && <>Hi, <span className="bg-clip-text text-transparent bg-linear-to-r from-indigo-600 to-violet-600">{name}</span></>}
                         {activeView === 'history' && "Riwayat Transaksi"}
                         {activeView === 'favorites' && "Menu Favorit"}
@@ -44,7 +67,7 @@ export default function HeaderBar({ activeView, searchQuery, onSearchChange, onB
             </div>
 
             {activeView === 'menu' && (
-                <div className="relative group z-20 w-80">
+                <div className="relative group z-20 w-full sm:w-80">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <Search className="text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
                     </div>

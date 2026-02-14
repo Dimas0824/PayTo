@@ -15,18 +15,18 @@ type SidebarProps = {
 
 export default function Sidebar({ activeTab, onChangeTab, onLogout }: SidebarProps) {
     return (
-        <aside className="w-64 m-4 flex flex-col bg-white/40 backdrop-blur-2xl border border-white/50 rounded-[2.5rem] shadow-2xl shadow-indigo-100/20 p-6 z-20">
-            <div className="flex items-center gap-3 px-2 mb-10">
+        <aside className="w-[calc(100vw-1.5rem)] max-w-72 h-[calc(100vh-1.5rem)] my-3 ml-3 flex flex-col bg-white/40 backdrop-blur-2xl border border-white/50 rounded-[2rem] shadow-2xl shadow-indigo-100/20 p-4 z-20 sm:w-[calc(100vw-2rem)] sm:h-[calc(100vh-2rem)] sm:m-4 sm:rounded-[2.5rem] sm:p-6 lg:w-64 lg:max-w-64">
+            <div className="flex items-center gap-3 px-1 sm:px-2 mb-8 sm:mb-10">
                 <div className="w-10 h-10 bg-gradient-to-tr from-slate-800 to-slate-700 rounded-xl flex items-center justify-center text-white shadow-lg">
                     <LayoutDashboard size={20} />
                 </div>
                 <div>
-                    <h1 className="font-bold text-lg leading-tight">Admin<span className="text-indigo-600">Panel</span></h1>
+                    <h1 className="font-bold text-base sm:text-lg leading-tight">Admin<span className="text-indigo-600">Panel</span></h1>
                     <p className="text-[10px] text-slate-500 font-medium">Supervisor Access</p>
                 </div>
             </div>
 
-            <nav className="flex-1 space-y-2 overflow-y-auto custom-scrollbar-light pr-2">
+            <nav className="flex-1 min-h-0 space-y-2 overflow-y-auto custom-scrollbar-light pr-1 sm:pr-2">
                 <SidebarItem
                     icon={LayoutDashboard}
                     label="Dashboard"

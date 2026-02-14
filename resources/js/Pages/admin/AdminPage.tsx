@@ -115,12 +115,12 @@ export default function AdminPage() {
     };
 
     return (
-        <div className="min-h-screen w-full bg-[#f3f4f6] flex font-sans text-slate-800 overflow-hidden relative selection:bg-indigo-500 selection:text-white">
+        <div className="min-h-screen w-full bg-[#f3f4f6] flex font-sans text-slate-800 overflow-x-hidden overflow-y-hidden relative selection:bg-indigo-500 selection:text-white">
             <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-indigo-200 rounded-full blur-[120px] opacity-30 animate-pulse-slow"></div>
             <div className="absolute bottom-[0%] left-[0%] w-[30%] h-[30%] bg-blue-200 rounded-full blur-[100px] opacity-30"></div>
 
             <div
-                className={`fixed inset-y-0 left-0 z-30 transition-transform duration-300 lg:static lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-[130%]'}`}
+                className={`fixed inset-y-0 left-0 z-30 transition-transform duration-300 lg:static lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
                 <Sidebar
                     activeTab={activeTab}
@@ -142,9 +142,15 @@ export default function AdminPage() {
                 <Header
                     activeTab={activeTab}
                     showNotifications={showNotifications}
-                    onToggleNotifications={() => setShowNotifications(!showNotifications)}
+                    onToggleNotifications={() => {
+                        setShowNotifications((state) => !state);
+                        setShowUserMenu(false);
+                    }}
                     showUserMenu={showUserMenu}
-                    onToggleUserMenu={() => setShowUserMenu(!showUserMenu)}
+                    onToggleUserMenu={() => {
+                        setShowUserMenu((state) => !state);
+                        setShowNotifications(false);
+                    }}
                     notificationRef={notificationRef}
                     userMenuRef={userMenuRef}
                     notifications={NOTIFICATIONS_DATA}

@@ -3,6 +3,7 @@ import {
     Zap, Wifi, Shield, ArrowRight, Layout, Database,
     TrendingUp, BarChart3, Lock, Star, CreditCard, Box, Users
 } from 'lucide-react';
+import { PosLoginForm } from './login';
 
 // --- CUSTOM HOOKS ---
 
@@ -136,6 +137,7 @@ const Navbar = () => (
             {/* make this element group centered */}
             <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 gap-8 text-sm font-bold text-slate-500">
                 <a href="#" className="hover:text-indigo-600 transition-colors">Beranda</a>
+                <a href="#login" className="hover:text-indigo-600 transition-colors">Masuk</a>
                 <a href="#features" className="hover:text-indigo-600 transition-colors">Keunggulan</a>
                 <a href="#ui" className="hover:text-indigo-600 transition-colors">Tampilan</a>
             </div>
@@ -167,10 +169,13 @@ const Hero = () => (
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center w-full animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-400">
-                <button className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 flex items-center justify-center gap-2 group">
+                <a
+                    href="#login"
+                    className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 flex items-center justify-center gap-2 group"
+                >
                     Mulai Sekarang
                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                </button>
+                </a>
             </div>
 
             {/* 3D FLOATING MOCKUP HERO */}
@@ -281,7 +286,52 @@ const Hero = () => (
     </section>
 );
 
-// 4. FEATURE CARD (Updated to accept className for layout tweaks)
+// 4. LOGIN SECTION
+const LoginSection = () => {
+    const { ref, isVisible } = useScrollReveal(0.25);
+
+    return (
+        <section id="login" className="px-6 pb-24 md:pb-32 relative">
+            <div
+                ref={ref}
+                className={`max-w-6xl mx-auto rounded-[2.5rem] bg-white/70 backdrop-blur-xl border border-white/60 shadow-2xl shadow-indigo-500/10 p-6 md:p-10 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'}`}
+            >
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div className="space-y-5">
+                        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-xs font-bold uppercase tracking-wider">
+                            <Lock size={14} /> Login Terintegrasi
+                        </span>
+                        <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+                            Masuk langsung dari landing page.
+                        </h2>
+                        <p className="text-slate-500 text-base md:text-lg leading-relaxed font-medium">
+                            Login kasir maupun supervisor tetap menggunakan endpoint backend yang sama, tanpa berpindah halaman.
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                                Responsif untuk tablet dan mobile
+                            </div>
+                            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                                Pesan error tampil langsung di sini
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="rounded-[2rem] border border-slate-200 bg-slate-50/70 p-5 md:p-7">
+                        <PosLoginForm
+                            className="max-w-none"
+                            showMobileBrand={false}
+                            title="Masuk ke PayTo"
+                            subtitle="Masukkan kredensial untuk mulai transaksi."
+                        />
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+// 5. FEATURE CARD (Updated to accept className for layout tweaks)
 interface FeatureCardProps {
     icon: React.ComponentType<{ size?: number }>; // lucide icons accept size
     title: string;
@@ -322,7 +372,7 @@ const FeatureCard = ({ icon: Icon, title, desc, delay = '0ms', color = 'indigo',
     );
 };
 
-// 5. FEATURES SECTION (Layout Optimized for 5 Items)
+// 6. FEATURES SECTION (Layout Optimized for 5 Items)
 const Features = () => (
     <section id="features" className="py-32 px-6 relative overflow-hidden">
         <div className="max-w-6xl mx-auto relative z-10">
@@ -389,7 +439,7 @@ const Features = () => (
     </section>
 );
 
-// 6. SHOWCASE SECTION (Interactive Layout)
+// 7. SHOWCASE SECTION (Interactive Layout)
 const Showcase = () => {
     const { ref, isVisible } = useScrollReveal(0.3);
 
@@ -473,7 +523,7 @@ const Showcase = () => {
     );
 };
 
-// 7. CTA & FOOTER
+// 8. CTA & FOOTER
 const Footer = () => {
     const { ref, isVisible } = useScrollReveal(0.5);
 
@@ -508,6 +558,7 @@ export default function LandingPage() {
         <div className="bg-[#f8fafc] min-h-screen text-slate-800 font-sans selection:bg-indigo-500 selection:text-white overflow-x-hidden scroll-smooth">
             <Navbar />
             <Hero />
+            <LoginSection />
             <Features />
             <Showcase />
             <Footer />

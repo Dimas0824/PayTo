@@ -81,7 +81,7 @@ export default function Sidebar({
                     </button>
 
                     {showUserMenu && (
-                        <div className="absolute bottom-0 left-full ml-3 w-64 bg-white/80 backdrop-blur-xl border border-white/60 rounded-2xl shadow-2xl p-2 flex flex-col gap-1 z-50 animate-in slide-in-from-left-2 duration-200">
+                        <div className="absolute bottom-12 left-0 w-[min(16rem,calc(100vw-2rem))] bg-white/80 backdrop-blur-xl border border-white/60 rounded-2xl shadow-2xl p-2 flex flex-col gap-1 z-50 animate-in slide-in-from-left-2 duration-200 sm:bottom-0 sm:left-full sm:ml-3 sm:w-64">
 
                             <button
                                 onClick={() => onNavigate('profile')}

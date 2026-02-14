@@ -16,33 +16,25 @@ Seluruh tugas di bawah harus dikerjakan **tanpa menambah kompleksitas yang tidak
 
 ---
 
-## ✅ Task 1 — Do implementation about refund for sales transaction
+## ✅ Task 1 — Perbaiki pop up menu profile dan notifikasi
 
 ### Problem
 
-- Saat ini aplikasi POS tidak memiliki fitur refund untuk transaksi penjualan, yang menyebabkan kesulitan dalam mengelola pengembalian barang dan uang kepada pelanggan khusus pada toko berjenis retail, jika F&B tidak bisa mengaktifkan fitur refund.
-- Hal ini dapat mengakibatkan ketidakpuasan pelanggan dan kesulitan dalam pelacakan keuangan.
+- Pop up menu profile dan notifikasi saat ini memiliki beberapa masalah, tenggelam atau tertutup oleh elemen lain.
 
 ### Objective
 
-- Menambahkan fitur refund pada transaksi penjualan di aplikasi POS untuk memudahkan pengelolaan pengembalian barang dan uang kepada pelanggan.
+- Memperbaiki pop up menu profile dan notifikasi agar selalu muncul di atas elemen lain, memastikan pengguna dapat mengaksesnya dengan mudah.
 
 ### Expected Behavior
 
-- Pengguna dapat memilih transaksi penjualan yang ingin direfund dari histori transaksi.
-- Pengguna dapat memilih item yang akan direfund dan memasukkan jumlah refund.
-- Sistem akan memperbarui stok barang secara otomatis setelah refund dilakukan.
-- Sistem akan mencatat transaksi refund untuk pelacakan keuangan.
-- maksimal refund adalah sesuai dengan total pembayaran pada transaksi penjualan dan pengembalian dalam masa garansi (misal 2 hari, bisa dicustom oleh admin).
+- Pop up menu profile dan notifikasi harus selalu muncul di atas elemen lain, tidak tertutup oleh elemen lain, dan dapat diakses dengan mudah oleh pengguna.
 
 ### Implementation Details and Workflow
 
-- Tambahkan tombol "Refund" pada halaman detail transaksi penjualan di frontend.
-- Saat tombol "Refund" diklik, tampilkan form untuk memilih item yang akan direfund dan jumlah refund adalah sesuai harga item tidak termasuk pajak.
-- Sesuaikan backend untuk memproses refund, memperbarui stok barang, dan mencatat transaksi refund.
-- Pastikan seluruh perhitungan harga (termasuk pajak dan diskon) tetap bersumber dari backend.
-- Uji coba fitur refund untuk memastikan fungsionalitas berjalan dengan baik.
-- Pastikan fitur refund memerlukan SPV atau admin untuk melakukan proses refund.
+- Periksa struktur HTML dan CSS yang digunakan untuk pop up menu profile dan notifikasi.
+- Pastikan elemen pop up memiliki properti CSS `z-index` yang lebih tinggi daripada elemen lain di halaman.
+- Uji perubahan pada berbagai resolusi layar untuk memastikan pop up tetap dapat diakses dengan baik.
 
 ### Constraints
 
@@ -52,39 +44,29 @@ Seluruh tugas di bawah harus dikerjakan **tanpa menambah kompleksitas yang tidak
 
 ### Files Involved
 
-- `routes/web.php`
-- `app/Http/Controllers/Api/*`
-- `app/Models/Transaction.php`
-- `resources/js/Pages/Pos/components/views/HistoryView.tsx`
-- Context: kamu bisa menambahkan file baru jika diperlukan sesuai dengan kebutuhan implementasi. dan pastikan untuk mendokumentasikan file baru tersebut di dalam kode, berikan dokumentasi singkat saja 1-2 kalimat pada bagian atas file baru tersebut.
+- .github/image.png
 
 ---
 
-## ✅ Task 2 — Implementation Approval page for Supervisor
+## ✅ Task 2 — Perbaiki aksi products tab action
 
 ### Problem
 
-- Saat ini aplikasi POS memiliki hanya frontend approval untuk supervisor, namun belum ada halaman khusus untuk mengelola approval tersebut. Tidak ada fitur backend yang mendukung pengelolaan approval oleh supervisor.
-- Hal ini menyulitkan supervisor dalam mengelola dan memantau approval yang diberikan kepada kasir.
+- Aksi pada products tab saat ini tidak berfungsi dengan baik, menyebabkan pengguna kesulitan dalam mengelola produk dan icon aksi tidak terlihat atau tidak responsif.
 
 ### Objective
 
-- Mengimplementasikan Backend, API, dan Frontend halaman khusus untuk supervisor dalam mengelola approval di aplikasi POS.
+- Memperbaiki aksi pada products tab agar berfungsi dengan baik, memastikan pengguna dapat mengelola produk dengan mudah dan icon aksi terlihat serta responsif.
 
 ### Expected Behavior
 
-- Supervisor dapat mengakses halaman khusus untuk melihat daftar approval yang diberikan kepada kasir.
-- Supervisor dapat menyetujui atau menolak permintaan approval dari kasir melalui halaman tersebut
-- Sistem akan mencatat tindakan approval yang dilakukan oleh supervisor untuk pelacakan.
-- Sistem dapat mengirim notifikasi kepada kasir tentang status approval mereka dan mengirim notifikasi request approval kepada supervisor.
-- Opsional: Sistem dapat memberikan rekomendasi, sebaiknya ditolak atau disetujui (kamu bisa membaca aplikasi ini untuk menentukan berdasarkan apa sistem rekomendasi ini).
+- Aksi pada products tab harus berfungsi dengan baik, memungkinkan pengguna untuk mengelola produk dengan mudah, dan icon aksi harus terlihat serta responsif di berbagai perangkat.
 
 ### Implementation Details and Workflow
 
-- Tambahkan rute baru di backend untuk mengelola approval.
-- Buat controller baru untuk menangani logika approval.
-- Buat model baru jika diperlukan untuk menyimpan data approval.
-- Perbaiki halaman frontend khusus untuk supervisor agar dapat menampilkan daftar approval dan memungkinkan tindakan approve/deny (`resources/js/Pages/admin/components/tabs/ApprovalsTab.tsx`).
+- Periksa kode yang menangani aksi pada products tab, pastikan event handler terpasang dengan benar.
+- Pastikan icon aksi memiliki ukuran dan posisi yang sesuai agar terlihat jelas.
+- Uji perubahan pada berbagai resolusi layar untuk memastikan aksi dan icon tetap dapat diakses dengan baik.
 
 ### Constraints
 
@@ -94,16 +76,8 @@ Seluruh tugas di bawah harus dikerjakan **tanpa menambah kompleksitas yang tidak
 
 ### Files Involved
 
-- `routes/web.php`
-- `app/Http/Controllers/Api/ApprovalController.php` *new file*
-- `app/Models/Approval.php`
-- `resources/js/Pages/admin/components/tabs/ApprovalsTab.tsx`
-- Context: kamu bisa menambahkan file baru jika diperlukan sesuai dengan kebutuhan implementasi. dan pastikan untuk mendokumentasikan file baru tersebut di dalam kode, berikan dokumentasi singkat saja 1-2 kalimat pada bagian atas file baru tersebut.
+- resources/js/Pages/admin/components/tabs/ProductsTab.tsx
 
 ---
 
-# NOTES
-
-Untuk setiap task yang saya berikan dari 1-3 merupakan task yang berkelanjutan dan saling terkait,
-mohon untuk mengerjakan setiap task dengan urutan dari 1 hingga 3 sesuai dengan nomor task yang diberikan. Implementasikan setiap task harus mempertimbangkan task sebelumnya agar integrasi berjalan dengan baik. Pastikan untuk melakukan testing menyeluruh setelah menyelesaikan setiap task sebelum melanjutkan ke task berikutnya. Kamu diberikan akses penuh ke seluruh kode sumber aplikasi POS ini untuk menyelesaikan task yang diberikan dan melakukan command terminal non-destructive.
-Before implementing the next task, make sure the previous task is fully functional and integrated properly. and I will review each task after you complete one task cuz this task is big task.
+--- END OF TASK LIST ---

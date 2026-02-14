@@ -90,9 +90,9 @@ export default function HistoryView({
                             <button
                                 type="button"
                                 onClick={() => toggle(tx.id)}
-                                className="w-full bg-white/40 backdrop-blur-md border border-white/50 rounded-3xl p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-all text-left"
+                                className="w-full bg-white/40 backdrop-blur-md border border-white/50 rounded-3xl p-4 sm:p-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between shadow-sm hover:shadow-md transition-all text-left"
                             >
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                                     <div
                                         className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner
                                         ${tx.status === 'VOID'
@@ -106,8 +106,8 @@ export default function HistoryView({
                                     </div>
 
                                     <div>
-                                        <div className="flex items-center gap-2">
-                                            <h4 className="font-bold text-slate-800">{tx.invoiceNo}</h4>
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <h4 className="font-bold text-slate-800 break-all">{tx.invoiceNo}</h4>
                                             {tx.status === 'VOID' && (
                                                 <span className="px-2 py-0.5 rounded-md bg-rose-500 text-white text-[10px] font-bold">
                                                     VOID
@@ -126,8 +126,8 @@ export default function HistoryView({
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-4">
-                                    <div className="text-right">
+                                <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 w-full sm:w-auto">
+                                    <div className="text-left sm:text-right min-w-0">
                                         <div className="font-mono font-bold text-lg text-slate-800">
                                             {formatRupiah(tx.total).replace(',00', '')}
                                         </div>
@@ -287,7 +287,7 @@ export default function HistoryView({
                     );
                 })}
 
-                <div className="flex items-center justify-between border-t border-slate-200/50 mt-2 pt-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-t border-slate-200/50 mt-2 pt-4">
                     <button
                         type="button"
                         disabled={page <= 1}

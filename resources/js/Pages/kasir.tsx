@@ -39,6 +39,8 @@ export default function PosInterface() {
     const [showApprovalModal, setShowApprovalModal] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isLargeScreen, setIsLargeScreen] = useState(false);
     const [showPaymentSuccessModal, setShowPaymentSuccessModal] = useState(false);
     const [lastPaymentSummary, setLastPaymentSummary] = useState<{
         method: 'CASH' | 'EWALLET';
@@ -75,6 +77,24 @@ export default function PosInterface() {
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const handleResize = () => {
+            const wide = window.innerWidth >= 1024;
+            setIsLargeScreen(wide);
+            setIsSidebarOpen(wide);
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
         };
     }, []);
 
@@ -317,6 +337,9 @@ export default function PosInterface() {
     const navigateTo = (view: typeof activeView) => {
         setActiveView(view);
         setShowUserMenu(false);
+        if (!isLargeScreen) {
+            setIsSidebarOpen(false);
+        }
     }
 
     // --- Render Helpers ---
@@ -413,27 +436,43 @@ export default function PosInterface() {
 
     return (
         // Main Background
-        <div className="h-screen w-full bg-[#f3f4f6] relative flex font-sans overflow-hidden text-slate-800 selection:bg-indigo-500 selection:text-white">
+        <div className="min-h-screen lg:h-screen w-full bg-[#f3f4f6] relative flex flex-col lg:flex-row font-sans overflow-x-hidden lg:overflow-hidden text-slate-800 selection:bg-indigo-500 selection:text-white">
 
             {/* Background Ambience */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-200 rounded-full blur-[120px] opacity-40 animate-pulse-slow"></div>
-            <div className="absolute bottom-[-10%] left-[20%] w-[30%] h-[30%] bg-blue-200 rounded-full blur-[100px] opacity-40"></div>
-            <div className="absolute top-[20%] right-[40%] w-[25%] h-[25%] bg-indigo-200 rounded-full blur-[100px] opacity-30"></div>
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-200 rounded-full blur-[120px] opacity-40 animate-pulse-slow pointer-events-none"></div>
+            <div className="absolute bottom-[-10%] left-[20%] w-[30%] h-[30%] bg-blue-200 rounded-full blur-[100px] opacity-40 pointer-events-none"></div>
+            <div className="absolute top-[20%] right-[40%] w-[25%] h-[25%] bg-indigo-200 rounded-full blur-[100px] opacity-30 pointer-events-none"></div>
 
             {/* 1. SIDEBAR (Navigation) */}
-            <Sidebar
-                activeView={activeView}
-                isOffline={isOffline}
-                onToggleOffline={() => setIsOffline(!isOffline)}
-                showUserMenu={showUserMenu}
-                onToggleUserMenu={() => setShowUserMenu(!showUserMenu)}
-                onNavigate={navigateTo}
-                onLogout={handleLogout}
-                userMenuRef={userMenuRef}
-            />
+            <div
+                className={`${isLargeScreen
+                    ? 'relative z-30'
+                    : `fixed inset-y-0 left-0 z-40 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`
+                    }`}
+            >
+                <Sidebar
+                    activeView={activeView}
+                    isOffline={isOffline}
+                    onToggleOffline={() => setIsOffline(!isOffline)}
+                    showUserMenu={showUserMenu}
+                    onToggleUserMenu={() => setShowUserMenu(!showUserMenu)}
+                    onNavigate={navigateTo}
+                    onLogout={handleLogout}
+                    userMenuRef={userMenuRef}
+                />
+            </div>
+
+            {!isLargeScreen && isSidebarOpen && (
+                <button
+                    type="button"
+                    aria-label="Tutup sidebar"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="fixed inset-0 z-30 bg-slate-900/40"
+                />
+            )}
 
             {/* 2. DYNAMIC CONTENT AREA */}
-            <div className="flex-1 flex flex-col relative h-full py-4 px-6 gap-6 z-10">
+            <div className="flex-1 flex flex-col relative min-w-0 lg:h-full py-3 lg:py-4 px-3 sm:px-4 lg:px-6 gap-4 lg:gap-6 z-10">
 
                 {/* Header (Dynamic) */}
                 <HeaderBar
@@ -441,6 +480,8 @@ export default function PosInterface() {
                     searchQuery={searchQuery}
                     onSearchChange={setSearchQuery}
                     onBack={() => setActiveView('menu')}
+                    onToggleSidebar={() => setIsSidebarOpen(state => !state)}
+                    showSidebarToggle={!isLargeScreen}
                     searchInputRef={searchInputRef}
                     displayName={displayName || PROFILE.displayName || 'Kasir'}
                 />

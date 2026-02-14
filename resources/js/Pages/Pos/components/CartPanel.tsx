@@ -29,13 +29,13 @@ export default function CartPanel({
     formatRupiah,
 }: CartPanelProps) {
     return (
-        <div className="w-100 xl:w-110 m-4 relative z-40 flex flex-col h-[calc(100vh-2rem)] rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-white/60 bg-white/40 backdrop-blur-3xl border border-white/50">
+        <div className="w-auto mx-3 mb-3 mt-0 sm:mx-4 sm:mb-4 lg:w-100 xl:w-110 lg:m-4 relative z-20 lg:z-40 flex flex-col h-[68vh] sm:h-[70vh] lg:h-[calc(100vh-2rem)] rounded-[2rem] lg:rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-white/60 bg-white/40 backdrop-blur-3xl border border-white/50">
             <div className="absolute inset-0 opacity-[0.4]" style={{ backgroundImage: 'radial-gradient(#a5b4fc 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
 
             <div className="relative z-10 flex flex-col h-full text-slate-800">
-                <div className="px-8 pt-8 pb-4 flex items-center justify-between border-b border-indigo-100/50">
+                <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-4 flex items-center justify-between border-b border-indigo-100/50">
                     <div>
-                        <h2 className="text-xl font-bold tracking-tight text-slate-800">Current Order</h2>
+                        <h2 className="text-lg sm:text-xl font-bold tracking-tight text-slate-800">Current Order</h2>
                         <div className="flex items-center gap-2 mt-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             <p className="text-xs font-medium text-slate-500">#2049 • Walk-in</p>
@@ -50,7 +50,7 @@ export default function CartPanel({
                     </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3 custom-scrollbar-light">
+                <div className="flex-1 overflow-y-auto px-3 sm:px-5 lg:px-6 py-4 space-y-3 custom-scrollbar-light">
                     {cart.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
                             <div className="w-20 h-20 rounded-3xl bg-white/40 border border-white/50 flex items-center justify-center shadow-sm rotate-3">
@@ -111,7 +111,7 @@ export default function CartPanel({
                     )}
                 </div>
 
-                <div className="bg-white/50 backdrop-blur-xl p-6 border-t border-white/50 relative overflow-hidden">
+                <div className="bg-white/50 backdrop-blur-xl p-4 sm:p-5 lg:p-6 border-t border-white/50 relative overflow-hidden">
                     <div className="space-y-2 mb-6 relative z-10">
                         <div className="flex justify-between text-slate-500 text-xs font-medium">
                             <span>Subtotal</span>
@@ -130,14 +130,14 @@ export default function CartPanel({
                         <div className="h-px bg-indigo-100/50 my-2"></div>
                         <div className="flex justify-between items-end">
                             <span className="text-slate-600 font-bold text-sm">Total Tagihan</span>
-                            <span className="text-3xl font-bold font-mono text-slate-900 tracking-tight">{formatRupiah(grandTotal + ((subtotal - totalDiscount) * 0.11)).replace(",00", "")}</span>
+                            <span className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 tracking-tight">{formatRupiah(grandTotal + ((subtotal - totalDiscount) * 0.11)).replace(",00", "")}</span>
                         </div>
                     </div>
 
                     <button
                         disabled={cart.length === 0}
                         onClick={onCheckout}
-                        className="group relative w-full overflow-hidden bg-slate-900 text-white py-4 rounded-2xl font-bold text-lg shadow-xl shadow-slate-300/50 transition-all active:scale-[0.98] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3 hover:bg-black"
+                        className="group relative w-full overflow-hidden bg-slate-900 text-white py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg shadow-xl shadow-slate-300/50 transition-all active:scale-[0.98] disabled:opacity-50 disabled:shadow-none flex items-center justify-center gap-3 hover:bg-black"
                     >
                         <span className="relative z-10 flex items-center gap-2">
                             Bayar Sekarang <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
