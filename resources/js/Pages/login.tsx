@@ -11,6 +11,7 @@ interface PosLoginFormProps {
     showMobileBrand?: boolean;
     title?: string;
     subtitle?: string;
+    role?: 'KASIR' | 'ADMIN';
 }
 
 export function PosLoginForm({
@@ -18,8 +19,8 @@ export function PosLoginForm({
     showMobileBrand = true,
     title = 'Selamat Datang',
     subtitle = 'Silakan masuk untuk memulai shift Anda.',
+    role = 'KASIR',
 }: PosLoginFormProps) {
-    const role = 'KASIR';
     const [loginMethod, setLoginMethod] = useState('CREDENTIALS');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
