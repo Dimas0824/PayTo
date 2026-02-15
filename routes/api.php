@@ -32,3 +32,7 @@ Route::get('/pos/settings', [\App\Http\Controllers\Api\PosSettingsController::cl
 Route::post('/pos/settings/printer', [\App\Http\Controllers\Api\PosSettingsController::class, 'updatePrinter']);
 Route::post('/pos/settings/printer/test', [\App\Http\Controllers\Api\PosSettingsController::class, 'testPrinter']);
 Route::post('/pos/settings/refresh', [\App\Http\Controllers\Api\PosSettingsController::class, 'refreshSync']);
+Route::post('/pos/sync/batches', [\App\Http\Controllers\Api\PosSyncController::class, 'store']);
+Route::post('/push/subscriptions', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'store']);
+Route::delete('/push/subscriptions', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'destroy']);
+Route::post('/push/test', [\App\Http\Controllers\Api\PushSubscriptionController::class, 'sendTest']);

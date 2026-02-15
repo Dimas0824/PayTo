@@ -16,25 +16,29 @@ Seluruh tugas di bawah harus dikerjakan **tanpa menambah kompleksitas yang tidak
 
 ---
 
-## ✅ Task 1 — Perbaiki pop up menu profile dan notifikasi
+## ✅ Task 1 — Lakukan setup untuk mendukung pengembangan Fitur PWA (Progressive Web App) pada aplikasi POS
 
 ### Problem
 
-- Pop up menu profile dan notifikasi saat ini memiliki beberapa masalah, tenggelam atau tertutup oleh elemen lain.
+- PWA (Progressive Web App) adalah teknologi yang memungkinkan aplikasi web untuk memberikan pengalaman seperti aplikasi native, termasuk kemampuan offline, push notifications, dan akses ke fitur perangkat. Saat ini, aplikasi POS belum mendukung fitur PWA, yang dapat meningkatkan pengalaman pengguna dan memperluas aksesibilitas.
 
 ### Objective
 
-- Memperbaiki pop up menu profile dan notifikasi agar selalu muncul di atas elemen lain, memastikan pengguna dapat mengaksesnya dengan mudah.
+- Melakukan setup untuk mendukung pengembangan fitur PWA pada aplikasi POS, sehingga aplikasi dapat diakses secara offline, memberikan pengalaman pengguna yang lebih baik, dan memanfaatkan fitur perangkat.
+- do best practice untuk setup PWA di Laravel + React + TypeScript (Inertia POS).
 
 ### Expected Behavior
 
-- Pop up menu profile dan notifikasi harus selalu muncul di atas elemen lain, tidak tertutup oleh elemen lain, dan dapat diakses dengan mudah oleh pengguna.
+- Aplikasi POS dapat diakses secara offline dengan menggunakan service worker.
+- Pengguna dapat menerima push notifications dari aplikasi POS.
+- Aplikasi POS dapat diinstal sebagai aplikasi native di perangkat pengguna.
 
 ### Implementation Details and Workflow
 
-- Periksa struktur HTML dan CSS yang digunakan untuk pop up menu profile dan notifikasi.
-- Pastikan elemen pop up memiliki properti CSS `z-index` yang lebih tinggi daripada elemen lain di halaman.
-- Uji perubahan pada berbagai resolusi layar untuk memastikan pop up tetap dapat diakses dengan baik.
+- Tambahkan file `manifest.json` di root direktori proyek untuk mendefinisikan metadata aplikasi PWA.
+- Implementasikan service worker untuk mengelola caching dan memungkinkan akses offline.
+- Integrasikan push notifications menggunakan Web Push API.
+- Pastikan bahwa setup PWA tidak mengganggu fungsionalitas yang sudah ada dan tetap menjaga konsistensi kode dan desain UI/UX.
 
 ### Constraints
 
@@ -44,39 +48,7 @@ Seluruh tugas di bawah harus dikerjakan **tanpa menambah kompleksitas yang tidak
 
 ### Files Involved
 
-- .github/image.png
-
----
-
-## ✅ Task 2 — Perbaiki aksi products tab action
-
-### Problem
-
-- Aksi pada products tab saat ini tidak berfungsi dengan baik, menyebabkan pengguna kesulitan dalam mengelola produk dan icon aksi tidak terlihat atau tidak responsif.
-
-### Objective
-
-- Memperbaiki aksi pada products tab agar berfungsi dengan baik, memastikan pengguna dapat mengelola produk dengan mudah dan icon aksi terlihat serta responsif.
-
-### Expected Behavior
-
-- Aksi pada products tab harus berfungsi dengan baik, memungkinkan pengguna untuk mengelola produk dengan mudah, dan icon aksi harus terlihat serta responsif di berbagai perangkat.
-
-### Implementation Details and Workflow
-
-- Periksa kode yang menangani aksi pada products tab, pastikan event handler terpasang dengan benar.
-- Pastikan icon aksi memiliki ukuran dan posisi yang sesuai agar terlihat jelas.
-- Uji perubahan pada berbagai resolusi layar untuk memastikan aksi dan icon tetap dapat diakses dengan baik.
-
-### Constraints
-
-- Pastikan perubahan tidak mengganggu fungsionalitas yang sudah ada untuk pengguna saat ini.
-- Gunakan pola desain yang sudah ada di aplikasi untuk menjaga konsistensi kode, dan desain UI/UX.
-- Pastikan layout yang dibuat responsif dan dapat diakses di berbagai perangkat dengan doktrin mobile-first.
-
-### Files Involved
-
-- resources/js/Pages/admin/components/tabs/ProductsTab.tsx
+- belum ada file yang dibuat, silakan buat file baru sesuai kebutuhan untuk setup PWA.
 
 ---
 

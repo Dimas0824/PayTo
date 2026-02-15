@@ -2,6 +2,7 @@ import './bootstrap';
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { initializePwa } from './pwa/registerPwa';
 
 const appName = import.meta.env.VITE_APP_NAME || 'PayTo';
 
@@ -16,3 +17,5 @@ createInertiaApp({
         color: '#4F46E5',
     },
 });
+
+initializePwa();

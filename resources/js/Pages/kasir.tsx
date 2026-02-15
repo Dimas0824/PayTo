@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 
@@ -15,6 +15,7 @@ import UniversalModal from '../Components/UniversalModal';
 // import { CATEGORIES, QUICK_CASH_AMOUNTS } from './Pos/data';
 import type { CartItem, Product, TransactionHistory } from './Pos/types';
 import { Box, Coffee, LayoutGrid, Utensils } from 'lucide-react';
+import { countQueuedTransactions, enqueueCheckoutTransaction, flushCheckoutQueue } from '../pwa/offlineQueue';
 
 export const CATEGORIES = [
     { id: 'All', label: 'All Items', icon: LayoutGrid },
@@ -40,7 +41,7 @@ export default function PosInterface() {
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isLargeScreen, setIsLargeScreen] = useState(false);
+    const [isMobileSidebarMode, setIsMobileSidebarMode] = useState(false);
     const [showPaymentSuccessModal, setShowPaymentSuccessModal] = useState(false);
     const [lastPaymentSummary, setLastPaymentSummary] = useState<{
         method: 'CASH' | 'EWALLET';
@@ -85,18 +86,64 @@ export default function PosInterface() {
             return;
         }
 
-        const handleResize = () => {
-            const wide = window.innerWidth >= 1024;
-            setIsLargeScreen(wide);
-            setIsSidebarOpen(wide);
+        const mediaQuery = window.matchMedia('(max-width: 1023px)');
+
+        const handleSidebarMode = (event: MediaQueryList | MediaQueryListEvent) => {
+            const mobileMode = event.matches;
+            setIsMobileSidebarMode(mobileMode);
+            setIsSidebarOpen(!mobileMode);
         };
 
-        handleResize();
-        window.addEventListener('resize', handleResize);
+        handleSidebarMode(mediaQuery);
+        mediaQuery.addEventListener('change', handleSidebarMode);
+
         return () => {
-            window.removeEventListener('resize', handleResize);
+            mediaQuery.removeEventListener('change', handleSidebarMode);
         };
     }, []);
+
+    const syncPendingTransactions = useCallback(async () => {
+        setSyncStatus('syncing');
+        const result = await flushCheckoutQueue();
+        setSyncStatus(result.pending > 0 ? 'pending' : 'synced');
+    }, []);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const updateNetworkState = async () => {
+            const offline = !window.navigator.onLine;
+            setIsOffline(offline);
+
+            if (offline) {
+                const pending = await countQueuedTransactions();
+                setSyncStatus(pending > 0 ? 'pending' : 'synced');
+
+                return;
+            }
+
+            await syncPendingTransactions();
+        };
+
+        const handleOnline = () => {
+            void updateNetworkState();
+        };
+
+        const handleOffline = () => {
+            void updateNetworkState();
+        };
+
+        void updateNetworkState();
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, [syncPendingTransactions]);
 
     const { products: serverProducts = [], history: serverHistory = [], profile: serverProfile = {} } = usePage().props as any;
 
@@ -196,18 +243,30 @@ export default function PosInterface() {
             return;
         }
 
+        const checkoutPayload = {
+            payment_method: paymentMethod,
+            cash_received: paymentMethod === 'CASH' ? Number(cashReceived) : undefined,
+            items: cart.map((item) => ({
+                product_id: item.id,
+                qty: item.qty,
+                discount_amount: item.discount,
+            })),
+        };
+
+        if (isOffline || (typeof navigator !== 'undefined' && !navigator.onLine)) {
+            await enqueueCheckoutTransaction(checkoutPayload);
+            setShowPaymentModal(false);
+            setCart([]);
+            setCashReceived("");
+            setSyncStatus('pending');
+
+            return;
+        }
+
         setSyncStatus('syncing');
 
         try {
-            const response = await axios.post('/api/pos/checkout', {
-                payment_method: paymentMethod,
-                cash_received: paymentMethod === 'CASH' ? Number(cashReceived) : undefined,
-                items: cart.map((item) => ({
-                    product_id: item.id,
-                    qty: item.qty,
-                    discount_amount: item.discount,
-                })),
-            });
+            const response = await axios.post('/api/pos/checkout', checkoutPayload);
 
             const responseStatus = (response?.data?.status || response?.data?.data?.status || response?.data?.payment?.status || '').toString().toLowerCase();
             const isPaymentConfirmed = ['confirmed', 'success', 'paid', 'settlement'].includes(responseStatus);
@@ -229,7 +288,15 @@ export default function PosInterface() {
                 });
                 setShowPaymentSuccessModal(true);
             }
-        } catch (e) {
+        } catch (e: unknown) {
+            const isNetworkError = axios.isAxiosError(e) && !e.response;
+            if (isNetworkError) {
+                await enqueueCheckoutTransaction(checkoutPayload);
+                setShowPaymentModal(false);
+                setCart([]);
+                setCashReceived("");
+            }
+
             setSyncStatus('pending');
         }
     };
@@ -331,13 +398,16 @@ export default function PosInterface() {
         }
         localStorage.removeItem('pos_logged_in');
         localStorage.removeItem('pos_role');
-        router.visit('/login');
+        window.location.assign('/login');
     };
 
     const navigateTo = (view: typeof activeView) => {
         setActiveView(view);
         setShowUserMenu(false);
-        if (!isLargeScreen) {
+
+        const shouldCollapseSidebar = isMobileSidebarMode;
+
+        if (shouldCollapseSidebar) {
             setIsSidebarOpen(false);
         }
     }
@@ -445,10 +515,7 @@ export default function PosInterface() {
 
             {/* 1. SIDEBAR (Navigation) */}
             <div
-                className={`${isLargeScreen
-                    ? 'relative z-30'
-                    : `fixed inset-y-0 left-0 z-40 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`
-                    }`}
+                className={`fixed inset-y-0 left-0 z-40 transition-transform duration-300 lg:relative lg:z-30 lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
                 <Sidebar
                     activeView={activeView}
@@ -462,12 +529,12 @@ export default function PosInterface() {
                 />
             </div>
 
-            {!isLargeScreen && isSidebarOpen && (
+            {isMobileSidebarMode && isSidebarOpen && (
                 <button
                     type="button"
                     aria-label="Tutup sidebar"
                     onClick={() => setIsSidebarOpen(false)}
-                    className="fixed inset-0 z-30 bg-slate-900/40"
+                    className="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
                 />
             )}
 
@@ -481,7 +548,7 @@ export default function PosInterface() {
                     onSearchChange={setSearchQuery}
                     onBack={() => setActiveView('menu')}
                     onToggleSidebar={() => setIsSidebarOpen(state => !state)}
-                    showSidebarToggle={!isLargeScreen}
+                    showSidebarToggle
                     searchInputRef={searchInputRef}
                     displayName={displayName || PROFILE.displayName || 'Kasir'}
                 />

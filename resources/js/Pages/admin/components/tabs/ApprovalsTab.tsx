@@ -65,7 +65,15 @@ export default function ApprovalsTab() {
             await axios.post(`/api/admin/approvals/${log.id}/approve`);
             await fetchApprovals();
         } catch (error) {
-            setErrorMessage('Gagal menyetujui approval.');
+            const message = axios.isAxiosError(error)
+                ? (error.response?.data?.message ?? 'Gagal menyetujui approval.')
+                : 'Gagal menyetujui approval.';
+
+            setErrorMessage(message);
+
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
+                await fetchApprovals();
+            }
         } finally {
             setActionLoadingId(null);
         }
@@ -95,7 +103,15 @@ export default function ApprovalsTab() {
             setRejectTarget(null);
             await fetchApprovals();
         } catch (error) {
-            setRejectError('Gagal menolak approval.');
+            const message = axios.isAxiosError(error)
+                ? (error.response?.data?.message ?? 'Gagal menolak approval.')
+                : 'Gagal menolak approval.';
+
+            setRejectError(message);
+
+            if (axios.isAxiosError(error) && error.response?.status === 422) {
+                await fetchApprovals();
+            }
         } finally {
             setActionLoadingId(null);
         }

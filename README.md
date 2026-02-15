@@ -1,59 +1,220 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PayTo POS
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+PayTo adalah aplikasi Point of Sale (POS) berbasis **Laravel 12 + React (Inertia)** dengan fokus pada operasional kasir, manajemen admin, dukungan PWA, sinkronisasi transaksi offline, dan notifikasi push.
 
-## About Laravel
+Dokumen ini adalah **dokumentasi teknis project** untuk developer.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Untuk dokumentasi aplikasi (product overview + galeri), lihat README terpisah di luar folder project.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Ringkasan Fitur
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- POS kasir (checkout, histori transaksi, profil kasir)
+- Login dengan **username/password** atau **PIN 6 digit**
+- Dashboard admin (ringkasan penjualan, aktivitas terbaru, low stock)
+- CRUD produk dan manajemen stok
+- Rekomendasi restock berbasis penjualan 7 hari
+- Approval/refund flow (supervisor approval)
+- Manajemen staf (cashier/supervisor) dan reset PIN
+- Pengaturan struk & pengaturan printer
+- PWA + offline queue sync (`/api/pos/sync/batches`)
+- Web Push Notification (VAPID)
 
-## Learning Laravel
+## Tech Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- Backend: Laravel 12, PHP 8.2+
+- Frontend: React 19, Inertia.js React, TypeScript
+- Build Tool: Vite 7
+- Styling: Tailwind CSS v4
+- HTTP Client: Axios
+- Push: `minishlink/web-push`
+- DB default: SQLite (bisa diganti ke MySQL/PostgreSQL)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Arsitektur Singkat
 
-## Laravel Sponsors
+- `routes/web.php`: route halaman Inertia (`/`, `/login`, `/kasir`, `/admin`)
+- `routes/api.php`: endpoint data POS/Admin/Push
+- `resources/js/Pages`: UI page-level (landing, login, kasir, admin)
+- `app/Http/Controllers/Api`: endpoint bisnis admin/POS
+- `app/Services/Pos/CheckoutProcessor.php`: core logic checkout
+- `resources/js/pwa`: service worker registration, offline queue, push subscribe
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Prasyarat
 
-### Premium Partners
+- PHP `>= 8.2`
+- Composer `>= 2.x`
+- Node.js `>= 20` + npm
+- Ekstensi PHP umum Laravel (pdo, mbstring, openssl, dll)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Setup Lokal
 
-## Contributing
+1. Install dependency backend dan frontend:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+npm install
+```
 
-## Code of Conduct
+1. Siapkan environment:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+1. Siapkan database (default SQLite):
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+touch database/database.sqlite
+php artisan migrate --seed
+```
 
-## License
+1. Jalankan aplikasi (disarankan):
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+composer dev
+```
+
+Perintah di atas menjalankan:
+
+- `php artisan serve`
+- `npm run dev`
+- `php artisan queue:listen`
+
+Alternatif manual:
+
+```bash
+php artisan serve
+npm run dev
+```
+
+## Script Penting
+
+- `composer setup`: bootstrap cepat untuk environment production-like
+- `composer dev`: jalankan server + queue + vite secara paralel
+- `composer test`: clear config lalu jalankan test suite
+- `npm run dev`: vite dev server
+- `npm run build`: build asset production
+
+## Variabel Environment Penting
+
+Lihat `.env.example` untuk nilai default. Yang paling relevan:
+
+- `APP_NAME`, `APP_ENV`, `APP_URL`
+- `DB_CONNECTION` (+ host/port/name/user/pass jika non-sqlite)
+- `SESSION_DRIVER`, `QUEUE_CONNECTION`, `CACHE_STORE`
+- `WEBPUSH_VAPID_SUBJECT`
+- `WEBPUSH_VAPID_PUBLIC_KEY`
+- `WEBPUSH_VAPID_PRIVATE_KEY`
+
+Catatan push notification:
+
+- Public key disuntik ke `<meta name="webpush-public-key">` di `resources/views/app.blade.php`
+- Service worker di `public/sw.js`
+
+## Peta Endpoint
+
+### Web
+
+- `GET /` -> landing page
+- `GET /login` -> halaman login
+- `POST /login` -> proses login POS
+- `GET /kasir` -> halaman kasir
+- `GET /admin` -> halaman admin
+
+### API Admin (contoh utama)
+
+- `GET /api/admin/dashboard`
+- `GET|POST|PUT|DELETE /api/admin/products[/{product}]`
+- `GET /api/admin/inventory/recommendations`
+- `GET|PUT /api/admin/receipt-settings`
+- `GET /api/admin/approvals`
+- `POST /api/admin/approvals/{approval}/approve`
+- `POST /api/admin/approvals/{approval}/reject`
+- `GET|POST|PUT|DELETE /api/admin/staff[/{user}]`
+- `POST /api/admin/staff/{user}/reset-pin`
+
+### API POS / PWA
+
+- `GET /api/pos/products`
+- `GET /api/pos/history`
+- `GET /api/pos/profile`
+- `POST /api/pos/checkout`
+- `POST /api/pos/refunds`
+- `POST /api/pos/logout`
+- `GET /api/pos/settings`
+- `POST /api/pos/settings/printer`
+- `POST /api/pos/settings/printer/test`
+- `POST /api/pos/settings/refresh`
+- `POST /api/pos/sync/batches`
+
+### API Push
+
+- `POST /api/push/subscriptions`
+- `DELETE /api/push/subscriptions`
+- `POST /api/push/test`
+
+## Testing
+
+Jalankan semua test feature/unit:
+
+```bash
+composer test
+```
+
+Beberapa cakupan test yang sudah ada:
+
+- Dashboard admin metrics
+- CRUD produk + stok
+- Sync batch idempotency (`PROCESSED`/`DUPLICATE`/`FAILED`)
+- Refund + approval flow
+- Receipt settings
+- Staff management + reset PIN
+- Push subscription
+
+## Build Production
+
+```bash
+composer install --no-dev --optimize-autoloader
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+npm run build
+```
+
+Pastikan:
+
+- environment production sudah benar
+- worker queue aktif (untuk proses async jika dibutuhkan)
+- kunci VAPID terpasang bila fitur push dipakai
+
+## Struktur Folder Inti
+
+```text
+app/
+  Http/
+  Models/
+  Services/Pos/
+resources/
+  js/
+    Pages/
+    pwa/
+  views/
+routes/
+  web.php
+  api.php
+public/
+  sw.js
+  manifest.json
+database/
+  migrations/
+  seeders/
+tests/
+  Feature/
+```
+
+## Catatan
+
+- Dokumentasi ini fokus untuk pengembangan dan operasional project.
+- Dokumentasi aplikasi (non-teknis + galeri) dipisah pada README di luar folder project agar konteks tidak tercampur.
+- **Aplikasi ini masih dalam tahap pengembangan, jadi beberapa fitur mungkin belum lengkap atau masih dalam iterasi. Dokumentasi akan terus diperbarui seiring perkembangan project.**
+- **Untuk pertanyaan atau kontribusi, silakan hubungi tim pengembang melalui issue atau pull request di repository.**

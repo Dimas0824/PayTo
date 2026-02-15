@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import {
     Zap, User, Lock, ArrowRight, Eye, EyeOff,
-    LayoutGrid, ShieldCheck, AlertCircle, Check
+    LayoutGrid, ShieldCheck, AlertCircle, Check, Download
 } from 'lucide-react';
+
+interface BeforeInstallPromptEvent extends Event {
+    prompt: () => Promise<void>;
+    userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+}
 
 interface PosLoginFormProps {
     className?: string;
@@ -28,6 +33,45 @@ export function PosLoginForm({
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [installPromptEvent, setInstallPromptEvent] = useState<BeforeInstallPromptEvent | null>(null);
+    const [isInstalling, setIsInstalling] = useState(false);
+
+    useEffect(() => {
+        const handleBeforeInstallPrompt = (event: Event) => {
+            event.preventDefault();
+            setInstallPromptEvent(event as BeforeInstallPromptEvent);
+        };
+
+        const handleAppInstalled = () => {
+            setInstallPromptEvent(null);
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.addEventListener('appinstalled', handleAppInstalled);
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', handleAppInstalled);
+        };
+    }, []);
+
+    const handleInstallApp = async () => {
+        if (!installPromptEvent || isInstalling) {
+            return;
+        }
+
+        setIsInstalling(true);
+
+        try {
+            await installPromptEvent.prompt();
+            const choiceResult = await installPromptEvent.userChoice;
+            if (choiceResult.outcome === 'accepted') {
+                setInstallPromptEvent(null);
+            }
+        } finally {
+            setIsInstalling(false);
+        }
+    };
 
     const handleLogin = async (e?: React.SyntheticEvent) => {
         e?.preventDefault();
@@ -87,6 +131,18 @@ export function PosLoginForm({
                 )}
                 <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">{title}</h2>
                 <p className="text-sm md:text-base text-slate-500">{subtitle}</p>
+
+                {installPromptEvent && (
+                    <button
+                        type="button"
+                        onClick={handleInstallApp}
+                        disabled={isInstalling}
+                        className="mt-4 inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-bold text-indigo-700 hover:bg-indigo-100 disabled:opacity-60"
+                    >
+                        <Download size={16} />
+                        {isInstalling ? 'Menyiapkan instalasi...' : 'Install App'}
+                    </button>
+                )}
             </div>
 
             <div className="flex p-1 bg-white/50 border border-white/60 rounded-xl md:rounded-2xl mb-6 relative">

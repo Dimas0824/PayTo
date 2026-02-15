@@ -3,7 +3,6 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { router } from '@inertiajs/react';
 import axios from 'axios';
 import type { AdminTab } from './types';
 import { ADMIN_PROFILE, NOTIFICATIONS_DATA } from './mockData';
@@ -104,10 +103,16 @@ export default function AdminPage() {
         setShowLogoutModal(true);
     };
 
-    const confirmLogout = () => {
+    const confirmLogout = async () => {
+        try {
+            await axios.post('/api/pos/logout');
+        } catch (error) {
+            // silent
+        }
+
         localStorage.removeItem('pos_logged_in');
         localStorage.removeItem('pos_role');
-        router.visit('/login');
+        window.location.assign('/login');
     };
 
     const toggleSidebar = () => {

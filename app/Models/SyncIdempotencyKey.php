@@ -13,13 +13,7 @@ class SyncIdempotencyKey extends Model
 
     protected $fillable = [
         'key',
-        'used_at',
+        'ref_type',
+        'ref_id',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'used_at' => 'datetime',
-        ];
-    }
 }

@@ -12,15 +12,17 @@ class SyncBatch extends Model
     protected $table = 'sync_batches';
 
     protected $fillable = [
-        'batch_key',
+        'device_id',
+        'batch_uuid',
+        'pushed_at',
         'status',
-        'payload_json',
+        'error_message',
     ];
 
     protected function casts(): array
     {
         return [
-            'payload_json' => 'array',
+            'pushed_at' => 'datetime',
         ];
     }
 }
