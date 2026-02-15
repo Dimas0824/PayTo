@@ -2,7 +2,7 @@
  * Products tab with list and add/edit modal.
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { Edit, Minus, Package, Plus, Save, Settings, Trash2, UploadCloud, X } from 'lucide-react';
 import type { Product } from '../../types';
@@ -29,6 +29,9 @@ const defaultFormState: ProductFormState = {
     is_active: true,
 };
 
+const formatStockProductLabel = (product: Product) => `${product.name} (${product.sku ?? 'Tanpa SKU'})`;
+const normalizeSearchValue = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
 export default function ProductsTab() {
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -41,10 +44,13 @@ export default function ProductsTab() {
     const [stockAction, setStockAction] = useState<StockAction>('ADD');
     const [selectedStockProductId, setSelectedStockProductId] = useState<number | ''>('');
     const [stockQuantity, setStockQuantity] = useState('');
-    const [stockSearch, setStockSearch] = useState('');
+    const [stockProductKeyword, setStockProductKeyword] = useState('');
+    const [debouncedStockProductKeyword, setDebouncedStockProductKeyword] = useState('');
+    const [showStockProductDropdown, setShowStockProductDropdown] = useState(false);
     const [stockError, setStockError] = useState<string | null>(null);
     const [stockSuccess, setStockSuccess] = useState<string | null>(null);
     const [stockSubmitting, setStockSubmitting] = useState(false);
+    const stockProductDropdownRef = useRef<HTMLDivElement | null>(null);
 
     const currencyFormatter = useMemo(() => new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -58,17 +64,20 @@ export default function ProductsTab() {
     );
 
     const filteredStockProducts = useMemo(() => {
-        const keyword = stockSearch.trim().toLowerCase();
+        const keyword = normalizeSearchValue(debouncedStockProductKeyword);
         if (!keyword) {
-            return products;
+            return products.slice(0, 30);
         }
 
         return products.filter((product) => {
-            const name = product.name.toLowerCase();
-            const sku = (product.sku ?? '').toLowerCase();
-            return name.includes(keyword) || sku.includes(keyword);
-        });
-    }, [products, stockSearch]);
+            const searchableText = normalizeSearchValue(
+                `${product.name} ${product.sku ?? ''} ${product.barcode ?? ''} ${product.uom ?? ''}`
+            );
+            return searchableText.includes(keyword);
+        }).slice(0, 30);
+    }, [products, debouncedStockProductKeyword]);
+
+    const isStockSearchDebouncing = stockProductKeyword.trim().toLowerCase() !== debouncedStockProductKeyword.trim().toLowerCase();
 
     const stockPreview = useMemo(() => {
         if (!selectedStockProduct) {
@@ -121,20 +130,45 @@ export default function ProductsTab() {
     }, []);
 
     useEffect(() => {
-        if (!showStockModal) {
+        const timeoutId = window.setTimeout(() => {
+            setDebouncedStockProductKeyword(stockProductKeyword);
+        }, 300);
+
+        return () => {
+            window.clearTimeout(timeoutId);
+        };
+    }, [stockProductKeyword]);
+
+    useEffect(() => {
+        if (!showStockModal || selectedStockProductId === '') {
             return;
         }
 
-        if (filteredStockProducts.length === 0) {
-            setSelectedStockProductId('');
-            return;
-        }
-
-        const selectedStillExists = filteredStockProducts.some((item) => item.id === selectedStockProductId);
+        const selectedStillExists = products.some((item) => item.id === selectedStockProductId);
         if (!selectedStillExists) {
-            setSelectedStockProductId(filteredStockProducts[0].id);
+            setSelectedStockProductId('');
+            setStockProductKeyword('');
+            setDebouncedStockProductKeyword('');
         }
-    }, [showStockModal, filteredStockProducts, selectedStockProductId]);
+    }, [showStockModal, products, selectedStockProductId]);
+
+    useEffect(() => {
+        if (!showStockModal || !showStockProductDropdown) {
+            return;
+        }
+
+        const handleClickOutside = (event: MouseEvent) => {
+            const targetNode = event.target as Node;
+            if (stockProductDropdownRef.current && !stockProductDropdownRef.current.contains(targetNode)) {
+                setShowStockProductDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showStockModal, showStockProductDropdown]);
 
     const handleOpenCreate = () => {
         setEditingProduct(null);
@@ -167,7 +201,9 @@ export default function ProductsTab() {
         setStockAction('ADD');
         setSelectedStockProductId('');
         setStockQuantity('');
-        setStockSearch('');
+        setStockProductKeyword('');
+        setDebouncedStockProductKeyword('');
+        setShowStockProductDropdown(false);
         setStockError(null);
         setStockSuccess(null);
     };
@@ -177,8 +213,10 @@ export default function ProductsTab() {
         setStockSuccess(null);
         setStockAction('ADD');
         setStockQuantity('');
-        setStockSearch('');
-        setSelectedStockProductId(products[0]?.id ?? '');
+        setStockProductKeyword('');
+        setDebouncedStockProductKeyword('');
+        setShowStockProductDropdown(false);
+        setSelectedStockProductId('');
         setShowStockModal(true);
     };
 
@@ -188,6 +226,24 @@ export default function ProductsTab() {
         }
         setShowStockModal(false);
         resetStockForm();
+    };
+
+    const handleStockProductKeywordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setStockProductKeyword(event.target.value);
+        setSelectedStockProductId('');
+        setShowStockProductDropdown(true);
+        setStockError(null);
+        setStockSuccess(null);
+    };
+
+    const handleSelectStockProduct = (product: Product) => {
+        const nextLabel = formatStockProductLabel(product);
+        setSelectedStockProductId(product.id);
+        setStockProductKeyword(nextLabel);
+        setDebouncedStockProductKeyword(nextLabel);
+        setShowStockProductDropdown(false);
+        setStockError(null);
+        setStockSuccess(null);
     };
 
     const handleChange = (field: keyof ProductFormState) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -422,7 +478,7 @@ export default function ProductsTab() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <div className="flex justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity">
+                                            <div className="flex justify-end gap-2">
                                                 <button
                                                     type="button"
                                                     onClick={() => handleEditProduct(product)}
@@ -486,43 +542,68 @@ export default function ProductsTab() {
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                                        Cari Produk
-                                    </label>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                                    Cari & Pilih Produk
+                                </label>
+                                <div ref={stockProductDropdownRef} className="relative">
                                     <input
                                         type="text"
-                                        value={stockSearch}
-                                        onChange={(event) => setStockSearch(event.target.value)}
-                                        placeholder="Nama atau SKU"
+                                        value={stockProductKeyword}
+                                        onChange={handleStockProductKeywordChange}
+                                        onFocus={() => setShowStockProductDropdown(true)}
+                                        placeholder="Ketik nama, SKU, barcode, atau satuan produk"
                                         className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
                                     />
+
+                                    {showStockProductDropdown && (
+                                        <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                                            <div className="max-h-64 overflow-y-auto py-1">
+                                                {filteredStockProducts.length === 0 ? (
+                                                    <div className="px-4 py-3 text-sm text-slate-400">
+                                                        Produk tidak ditemukan.
+                                                    </div>
+                                                ) : (
+                                                    filteredStockProducts.map((product) => {
+                                                        const isSelected = selectedStockProductId === product.id;
+                                                        return (
+                                                            <button
+                                                                key={product.id}
+                                                                type="button"
+                                                                onClick={() => handleSelectStockProduct(product)}
+                                                                className="w-full px-4 py-3 text-left hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-b-0"
+                                                            >
+                                                                <div className="flex items-start justify-between gap-3">
+                                                                    <div className="min-w-0">
+                                                                        <div className="font-semibold text-slate-700 truncate">{product.name}</div>
+                                                                        <div className="text-xs text-slate-400 font-mono truncate">
+                                                                            {product.sku ?? 'Tanpa SKU'}
+                                                                            {product.barcode ? ` • ${product.barcode}` : ''}
+                                                                            {` • stok ${product.stock}`}
+                                                                        </div>
+                                                                    </div>
+                                                                    {isSelected ? (
+                                                                        <span className="shrink-0 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5">
+                                                                            Dipilih
+                                                                        </span>
+                                                                    ) : null}
+                                                                </div>
+                                                            </button>
+                                                        );
+                                                    })
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                                        Pilih Produk
-                                    </label>
-                                    <select
-                                        value={selectedStockProductId === '' ? '' : String(selectedStockProductId)}
-                                        onChange={(event) => {
-                                            const value = event.target.value;
-                                            setSelectedStockProductId(value ? Number(value) : '');
-                                            setStockSuccess(null);
-                                            setStockError(null);
-                                        }}
-                                        className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
-                                    >
-                                        {filteredStockProducts.length === 0 ? (
-                                            <option value="">Produk tidak ditemukan</option>
-                                        ) : (
-                                            filteredStockProducts.map((product) => (
-                                                <option key={product.id} value={product.id}>
-                                                    {product.name} ({product.sku ?? 'Tanpa SKU'})
-                                                </option>
-                                            ))
-                                        )}
-                                    </select>
+
+                                <div className="mt-2 flex items-center justify-between text-xs">
+                                    <span className={selectedStockProduct ? 'text-slate-600' : 'text-slate-400'}>
+                                        {selectedStockProduct ? `Produk terpilih: ${selectedStockProduct.name}` : 'Belum ada produk dipilih.'}
+                                    </span>
+                                    {isStockSearchDebouncing ? (
+                                        <span className="text-slate-400">Mencari...</span>
+                                    ) : null}
                                 </div>
                             </div>
 
