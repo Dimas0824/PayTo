@@ -1,11 +1,87 @@
 * text=auto eol=lf
 
-*.blade.php diff=html
-*.css diff=css
-*.html diff=html
-*.md diff=markdown
-*.php diff=php
+# Source code
+*.php text diff=php
+*.css text
+*.scss text
+*.sass text
+*.js text
+*.ts text
+*.jsx text
+*.tsx text
+*.json text
+*.sql text
+*.xml text
 
-/.github export-ignore
-CHANGELOG.md export-ignore
-.styleci.yml export-ignore
+# Templates
+*.blade.php text diff=html
+*.html text diff=html
+*.md text diff=markdown
+*.txt text
+
+# Configuration
+*.yml text
+*.yaml text
+*.toml text
+*.ini text
+*.conf text
+.env* text
+*.lock text -diff
+
+# Scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Documentation
+*.markdown text diff=markdown
+AUTHORS text
+CHANGELOG text
+CHANGES text
+CONTRIBUTING text
+COPYING text
+copyright text
+*COPYRIGHT* text
+INSTALL text
+license text
+LICENSE text
+NEWS text
+readme text
+*README* text
+TODO text
+
+# Graphics
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+*.webp binary
+
+# Archives
+*.7z binary
+*.gz binary
+*.tar binary
+*.zip binary
+
+# Fonts
+*.ttf binary
+*.eot binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+
+# Executables
+*.exe binary
+*.pyc binary
+
+# RC files (like .babelrc or .eslintrc)
+*.*rc text
+
+# Ignore files (like .npmignore or .gitignore)
+*.*ignore text
+
+# Laravel specific
+composer.lock -diff
+package-lock.json -diff
+*.blade.php linguist-language=blade
