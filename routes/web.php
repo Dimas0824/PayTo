@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\PosLoginController;
 use App\Http\Controllers\Pos\PosController;
+use App\Http\Controllers\Pos\ReceiptController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -21,6 +22,11 @@ Route::post('/login', [PosLoginController::class, 'store'])
 Route::get('/kasir', [PosController::class, 'index'])
     ->middleware(['auth', 'role:CASHIER,SUPERVISOR'])
     ->name('pos.index');
+
+// Receipt route - Cashier and Supervisor
+Route::get('/pos/sales/{sale}/receipt', [ReceiptController::class, 'show'])
+    ->middleware(['auth', 'role:CASHIER,SUPERVISOR'])
+    ->name('pos.receipt');
 
 // Protected Admin route - Supervisor only
 Route::get('/admin', function () {

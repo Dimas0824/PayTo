@@ -21,10 +21,6 @@ import UniversalModal from '../../Components/UniversalModal';
 export default function AdminPage() {
     const [activeTab, setActiveTab] = useState<AdminTab>('DASHBOARD');
 
-    const [storeName, setStoreName] = useState("PayTo");
-    const [discountLimit, setDiscountLimit] = useState(20);
-    const [allowNegativeStock, setAllowNegativeStock] = useState(false);
-
     const [showNotifications, setShowNotifications] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -175,16 +171,7 @@ export default function AdminPage() {
                     {activeTab === 'RECEIPT' && <ReceiptTab />}
                     {activeTab === 'APPROVALS' && <ApprovalsTab />}
                     {activeTab === 'USERS' && <UsersTab />}
-                    {activeTab === 'SETTINGS' && (
-                        <SettingsTab
-                            storeName={storeName}
-                            onChangeStoreName={setStoreName}
-                            discountLimit={discountLimit}
-                            onChangeDiscountLimit={setDiscountLimit}
-                            allowNegativeStock={allowNegativeStock}
-                            onToggleAllowNegativeStock={() => setAllowNegativeStock(!allowNegativeStock)}
-                        />
-                    )}
+                    {activeTab === 'SETTINGS' && <SettingsTab />}
                 </div>
             </main>
 

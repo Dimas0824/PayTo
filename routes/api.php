@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AdminDashboardController;
 use App\Http\Controllers\Api\AdminProfileController;
 use App\Http\Controllers\Api\ApprovalController;
+use App\Http\Controllers\Api\BusinessSettingsController;
 use App\Http\Controllers\Api\InventoryRecommendationController;
 use App\Http\Controllers\Api\PosApiController;
 use App\Http\Controllers\Api\PosCheckoutController;
@@ -32,6 +33,10 @@ Route::middleware(['web', 'auth', 'role:SUPERVISOR'])->prefix('admin')->name('ap
     // Receipt settings
     Route::get('/receipt-settings', [ReceiptSettingsController::class, 'index'])->name('receipt-settings.index');
     Route::put('/receipt-settings', [ReceiptSettingsController::class, 'update'])->name('receipt-settings.update');
+
+    // Business settings
+    Route::get('/business-settings', [BusinessSettingsController::class, 'index'])->name('business-settings.index');
+    Route::put('/business-settings', [BusinessSettingsController::class, 'update'])->name('business-settings.update');
 
     // Approvals
     Route::get('/approvals', [ApprovalController::class, 'index'])->name('approvals.index');

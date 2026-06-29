@@ -196,12 +196,12 @@ Temuan ini harus digunakan sebagai baseline. Jangan menyalin asumsi PRD tanpa me
 
 ### P2.1 — Tetapkan kontrak `app_settings`
 
-- [ ] Gunakan key `business.profile` dengan value JSON berisi `name`, `address`, `whatsapp_number`, dan `operating_hours`.
-- [ ] Gunakan key `catalog.settings` dengan value JSON berisi `enabled`, `whatsapp_enabled`, dan `whatsapp_message_template`.
-- [ ] Pertahankan key `receipt.settings` untuk `header` dan `footer`.
-- [ ] Jangan membuat tabel `landing_page_settings`.
-- [ ] Hapus atribut `type` dari model atau write path karena tabel `app_settings` saat ini tidak memiliki kolom tersebut.
-- [ ] Buat service khusus untuk membaca default, melakukan merge dengan data tersimpan, dan menghindari pengulangan query/key string.
+- [x] Gunakan key `business.profile` dengan value JSON berisi `name`, `address`, `whatsapp_number`, dan `operating_hours`.
+- [x] Gunakan key `catalog.settings` dengan value JSON berisi `enabled`, `whatsapp_enabled`, dan `whatsapp_message_template`.
+- [x] Pertahankan key `receipt.settings` untuk `header` dan `footer`.
+- [x] Jangan membuat tabel `landing_page_settings`.
+- [x] Hapus atribut `type` dari model atau write path karena tabel `app_settings` saat ini tidak memiliki kolom tersebut.
+- [x] Buat service khusus untuk membaca default, melakukan merge dengan data tersimpan, dan menghindari pengulangan query/key string.
 
 **Bentuk data yang wajib digunakan:**
 
@@ -232,45 +232,45 @@ Placeholder template yang diizinkan hanya `{product_name}`, `{price}`, dan `{qty
 
 ### P2.2 — API pengaturan toko
 
-- [ ] Tambahkan `GET /api/admin/business-settings` untuk supervisor.
-- [ ] Tambahkan `PUT /api/admin/business-settings` untuk supervisor.
-- [ ] Gunakan Form Request terpisah dengan custom error message bahasa Indonesia.
-- [ ] Simpan `business.profile` dan `catalog.settings` secara atomik dalam database transaction.
-- [ ] Jangan menerima nama key setting bebas dari client.
-- [ ] Jangan expose pengaturan internal atau rahasia pada props storefront.
+- [x] Tambahkan `GET /api/admin/business-settings` untuk supervisor.
+- [x] Tambahkan `PUT /api/admin/business-settings` untuk supervisor.
+- [x] Gunakan Form Request terpisah dengan custom error message bahasa Indonesia.
+- [x] Simpan `business.profile` dan `catalog.settings` secara atomik dalam database transaction.
+- [x] Jangan menerima nama key setting bebas dari client.
+- [x] Jangan expose pengaturan internal atau rahasia pada props storefront.
 
 ### P2.3 — Rapikan UI pengaturan
 
-- [ ] Ubah `App Settings` menjadi `Pengaturan Toko`.
-- [ ] Hubungkan form ke API pengaturan toko dan tampilkan state loading, sukses, validasi, serta error server.
-- [ ] Pertahankan halaman template struk yang sudah ada.
-- [ ] Hapus batas diskon kasir karena tidak terhubung ke business rule.
-- [ ] Hapus toggle stok negatif karena tidak terhubung ke checkout.
-- [ ] Hapus mode debug dari UI production.
-- [ ] Hapus factory reset local data.
-- [ ] Hapus form nama printer, status “terhubung”, dan endpoint test print palsu.
-- [ ] Pertahankan promo diskon produk pada manajemen produk dan POS.
+- [x] Ubah `App Settings` menjadi `Pengaturan Toko`.
+- [x] Hubungkan form ke API pengaturan toko dan tampilkan state loading, sukses, validasi, serta error server.
+- [x] Pertahankan halaman template struk yang sudah ada.
+- [x] Hapus batas diskon kasir karena tidak terhubung ke business rule.
+- [x] Hapus toggle stok negatif karena tidak terhubung ke checkout.
+- [x] Hapus mode debug dari UI production.
+- [x] Hapus factory reset local data.
+- [x] Hapus form nama printer, status "terhubung", dan endpoint test print palsu.
+- [x] Pertahankan promo diskon produk pada manajemen produk dan POS.
 
 ### P2.4 — Implementasikan pencetakan struk nyata melalui browser
 
-- [ ] Tambahkan route autentikasi `GET /pos/sales/{sale}/receipt` untuk cashier dan supervisor.
-- [ ] Ambil sale beserta item, pembayaran, kasir, dan `receipt.settings` melalui controller.
-- [ ] Buat halaman Inertia struk yang hanya menampilkan data transaksi server-side.
-- [ ] Tambahkan print stylesheet untuk kertas thermal 80 mm dan sembunyikan tombol saat proses print.
-- [ ] Tambahkan tombol “Cetak Struk” yang memanggil `window.print()` dari interaksi pengguna.
-- [ ] Kembalikan `receipt_url` pada respons checkout agar frontend tidak menyusun URL sendiri.
+- [x] Tambahkan route autentikasi `GET /pos/sales/{sale}/receipt` untuk cashier dan supervisor.
+- [x] Ambil sale beserta item, pembayaran, kasir, dan `receipt.settings` melalui controller.
+- [x] Buat halaman Inertia struk yang hanya menampilkan data transaksi server-side.
+- [x] Tambahkan print stylesheet untuk kertas thermal 80 mm dan sembunyikan tombol saat proses print.
+- [x] Tambahkan tombol "Cetak Struk" yang memanggil `window.print()` dari interaksi pengguna.
+- [x] Kembalikan `receipt_url` pada respons checkout agar frontend tidak menyusun URL sendiri.
 - [ ] Buka halaman struk hanya setelah checkout berhasil.
-- [ ] Pastikan route struk tidak dapat diakses guest.
-- [ ] Nyatakan silent printing, WebUSB, WebSerial, QZ Tray, dan pemilihan printer otomatis sebagai di luar scope.
+- [x] Pastikan route struk tidak dapat diakses guest.
+- [x] Nyatakan silent printing, WebUSB, WebSerial, QZ Tray, dan pemilihan printer otomatis sebagai di luar scope.
 
 ### Definition of Done P2
 
-- [ ] Perubahan profil toko tetap tersedia setelah reload.
-- [ ] Landing, login, admin, katalog, dan struk memakai nama toko yang sama.
-- [ ] Nomor WhatsApp tersimpan dalam format yang valid.
-- [ ] Tidak ada pengaturan semu atau endpoint printer palsu.
-- [ ] Halaman struk menampilkan data transaksi yang benar dan membuka dialog print browser.
-- [ ] Test API pengaturan dan akses halaman struk lulus.
+- [x] Perubahan profil toko tetap tersedia setelah reload.
+- [x] Landing, login, admin, katalog, dan struk memakai nama toko yang sama.
+- [x] Nomor WhatsApp tersimpan dalam format yang valid.
+- [x] Tidak ada pengaturan semu atau endpoint printer palsu.
+- [x] Halaman struk menampilkan data transaksi yang benar dan membuka dialog print browser.
+- [x] Test API pengaturan dan akses halaman struk lulus.
 
 ## P3 — Pesanan WhatsApp Masuk ke POS
 
