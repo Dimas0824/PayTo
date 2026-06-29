@@ -354,48 +354,48 @@ Placeholder template yang diizinkan hanya `{product_name}`, `{price}`, dan `{qty
 
 ### P4.1 — Schema katalog minimum
 
-- [ ] Tambahkan `products.slug` unique.
-- [ ] Tambahkan `products.description` nullable.
-- [ ] Tambahkan `products.is_public` dengan default `false` agar produk lama tidak langsung dipublikasikan.
-- [ ] Tambahkan `products.featured` dengan default `false`.
-- [ ] Tambahkan `products.image_path` nullable untuk satu gambar utama pada MVP.
-- [ ] Tambahkan index untuk `is_public`, `featured`, dan kombinasi query katalog yang benar-benar digunakan.
-- [ ] Generate slug unik untuk produk lama tanpa mengubah nama maupun SKU.
-- [ ] Jangan membuat categories, multi-image gallery, review, atau related-product engine pada scope minimum ini.
+- [x] Tambahkan `products.slug` unique.
+- [x] Tambahkan `products.description` nullable.
+- [x] Tambahkan `products.is_public` dengan default `false` agar produk lama tidak langsung dipublikasikan.
+- [x] Tambahkan `products.featured` dengan default `false`.
+- [x] Tambahkan `products.image_path` nullable untuk satu gambar utama pada MVP.
+- [x] Tambahkan index untuk `is_public`, `featured`, dan kombinasi query katalog yang benar-benar digunakan.
+- [x] Generate slug unik untuk produk lama tanpa mengubah nama maupun SKU.
+- [x] Jangan membuat categories, multi-image gallery, review, atau related-product engine pada scope minimum ini.
 
 ### P4.2 — Manajemen produk publik
 
-- [ ] Perluas Form Request produk untuk `description`, `is_public`, dan `featured`.
-- [ ] Buat Form Request upload gambar dengan tipe `jpg`, `jpeg`, `png`, atau `webp` dan ukuran maksimum 2 MB.
+- [x] Perluas Form Request produk untuk `description`, `is_public`, dan `featured`.
+- [x] Buat Form Request upload gambar dengan tipe `jpg`, `jpeg`, `png`, atau `webp` dan ukuran maksimum 2 MB.
 - [ ] Simpan gambar di disk `public` dengan nama unik.
 - [ ] Hapus file lama setelah gambar pengganti berhasil disimpan.
 - [ ] Hapus file produk ketika produk dihapus.
-- [ ] Jangan menerima path file langsung dari client.
+- [x] Jangan menerima path file langsung dari client.
 - [ ] Tambahkan kontrol visibility, featured, deskripsi, dan gambar pada manajemen produk admin.
-- [ ] Pertahankan input promo diskon produk yang sudah ada.
+- [x] Pertahankan input promo diskon produk yang sudah ada.
 
 ### P4.3 — Route dan query storefront
 
-- [ ] Gunakan `GET /` untuk landing page toko.
-- [ ] Tambahkan `GET /katalog` untuk katalog dengan pagination dan pencarian nama produk.
-- [ ] Tambahkan `GET /katalog/{product:slug}` untuk detail produk.
-- [ ] Gunakan controller dan Inertia props; jangan membuat `/api/public/*` jika hanya dikonsumsi halaman tersebut.
-- [ ] Landing page hanya mengambil produk `is_active=true`, `is_public=true`, dan `featured=true`.
-- [ ] Katalog hanya mengambil produk aktif dan publik.
-- [ ] Detail produk mengembalikan `404` untuk produk nonaktif atau nonpublik.
-- [ ] Gunakan eager loading hanya untuk relationship yang memang dibutuhkan.
-- [ ] Jangan kirim `cost`, margin, supplier, audit log, atau field internal lain ke guest.
-- [ ] Hormati `catalog.settings.enabled`; ketika nonaktif, katalog mengembalikan halaman unavailable yang aman, bukan data produk.
+- [x] Gunakan `GET /` untuk landing page toko.
+- [x] Tambahkan `GET /katalog` untuk katalog dengan pagination dan pencarian nama produk.
+- [x] Tambahkan `GET /katalog/{product:slug}` untuk detail produk.
+- [x] Gunakan controller dan Inertia props; jangan membuat `/api/public/*` jika hanya dikonsumsi halaman tersebut.
+- [x] Landing page hanya mengambil produk `is_active=true`, `is_public=true`, dan `featured=true`.
+- [x] Katalog hanya mengambil produk aktif dan publik.
+- [x] Detail produk mengembalikan `404` untuk produk nonaktif atau nonpublik.
+- [x] Gunakan eager loading hanya untuk relationship yang memang dibutuhkan.
+- [x] Jangan kirim `cost`, margin, supplier, audit log, atau field internal lain ke guest.
+- [x] Hormati `catalog.settings.enabled`; ketika nonaktif, katalog mengembalikan halaman unavailable yang aman, bukan data produk.
 
 ### P4.4 — Builder tautan WhatsApp
 
-- [ ] Buat service backend yang menghasilkan URL `wa.me` dari pengaturan toko dan data produk.
-- [ ] Ganti placeholder `{product_name}`, `{price}`, dan `{qty}` dengan nilai yang sudah diformat.
-- [ ] Gunakan quantity awal `1`.
-- [ ] Encode pesan dengan benar sebelum dimasukkan ke query `text`.
-- [ ] Jangan masukkan cost, ID database internal, atau data staf ke pesan.
-- [ ] Jangan tampilkan tombol bila `whatsapp_enabled=false` atau nomor WhatsApp belum valid.
-- [ ] Tombol hanya membuka chat; tombol tidak membuat sale, draft order, atau reservasi stok.
+- [x] Buat service backend yang menghasilkan URL `wa.me` dari pengaturan toko dan data produk.
+- [x] Ganti placeholder `{product_name}`, `{price}`, dan `{qty}` dengan nilai yang sudah diformat.
+- [x] Gunakan quantity awal `1`.
+- [x] Encode pesan dengan benar sebelum dimasukkan ke query `text`.
+- [x] Jangan masukkan cost, ID database internal, atau data staf ke pesan.
+- [x] Jangan tampilkan tombol bila `whatsapp_enabled=false` atau nomor WhatsApp belum valid.
+- [x] Tombol hanya membuka chat; tombol tidak membuat sale, draft order, atau reservasi stok.
 
 ### P4.5 — UI storefront
 

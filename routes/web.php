@@ -3,12 +3,13 @@
 use App\Http\Controllers\Auth\PosLoginController;
 use App\Http\Controllers\Pos\PosController;
 use App\Http\Controllers\Pos\ReceiptController;
+use App\Http\Controllers\StorefrontController;
 use Illuminate\Support\Facades\Route;
 
-// Public routes
-Route::get('/', function () {
-    return inertia('landingPage');
-})->name('landing');
+// Public storefront routes
+Route::get('/', [StorefrontController::class, 'index'])->name('landing');
+Route::get('/katalog', [StorefrontController::class, 'catalog'])->name('catalog.index');
+Route::get('/katalog/{product:slug}', [StorefrontController::class, 'show'])->name('catalog.show');
 
 Route::get('/login', function () {
     return inertia('login');

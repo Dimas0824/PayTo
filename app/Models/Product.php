@@ -11,13 +11,18 @@ class Product extends Model
 
     protected $fillable = [
         'name',
+        'slug',
         'sku',
         'barcode',
         'price',
+        'description',
         'discount',
         'cost',
         'uom',
         'is_active',
+        'is_public',
+        'featured',
+        'image_path',
     ];
 
     protected function casts(): array
@@ -27,6 +32,8 @@ class Product extends Model
             'discount' => 'decimal:2',
             'cost' => 'decimal:2',
             'is_active' => 'boolean',
+            'is_public' => 'boolean',
+            'featured' => 'boolean',
         ];
     }
 
