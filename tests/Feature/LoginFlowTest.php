@@ -190,4 +190,43 @@ class LoginFlowTest extends TestCase
 
         $response->assertRedirect('/login');
     }
+
+    public function test_user_can_login_again_after_logout_invalidates_the_session(): void
+    {
+        $user = User::factory()->create([
+            'role' => 'CASHIER',
+            'username' => 'kasir-session',
+            'password_hash' => bcrypt('password123'),
+            'is_active' => true,
+        ]);
+
+        $this->post('/login', [
+            'login_method' => 'CREDENTIALS',
+            'username' => 'kasir-session',
+            'password' => 'password123',
+        ])->assertOk();
+
+        $this->assertAuthenticatedAs($user);
+
+        $sessionIdBeforeLogout = session()->getId();
+        $csrfTokenBeforeLogout = session()->token();
+
+        $this->post('/logout')
+            ->assertOk()
+            ->assertJson(['status' => 'ok']);
+
+        $this->assertGuest();
+        $this->assertNotSame($sessionIdBeforeLogout, session()->getId());
+        $this->assertNotSame($csrfTokenBeforeLogout, session()->token());
+
+        $this->get('/login')->assertOk();
+
+        $this->post('/login', [
+            'login_method' => 'CREDENTIALS',
+            'username' => 'kasir-session',
+            'password' => 'password123',
+        ])->assertOk();
+
+        $this->assertAuthenticatedAs($user);
+    }
 }

@@ -37,6 +37,8 @@ export default function PosInterface() {
     const [showApprovalModal, setShowApprovalModal] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [logoutError, setLogoutError] = useState<string | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isMobileSidebarMode, setIsMobileSidebarMode] = useState(false);
     const [showPaymentSuccessModal, setShowPaymentSuccessModal] = useState(false);
@@ -332,15 +334,27 @@ export default function PosInterface() {
 
     const handleLogout = () => {
         setShowUserMenu(false);
+        setLogoutError(null);
         setShowLogoutModal(true);
     }
 
     const confirmLogout = async () => {
+        setIsLoggingOut(true);
+        setLogoutError(null);
+
         try {
-            await axios.post('/api/pos/logout');
-        } catch (e) {
-            // silent
+            await axios.post('/logout');
+        } catch (error) {
+            const message = axios.isAxiosError(error)
+                ? error.response?.data?.message
+                : null;
+
+            setLogoutError(message ?? 'Logout gagal. Sesi Anda masih aktif, silakan coba lagi.');
+            setIsLoggingOut(false);
+
+            return;
         }
+
         localStorage.removeItem('pos_logged_in');
         localStorage.removeItem('pos_role');
         window.location.assign('/login');
@@ -589,11 +603,16 @@ export default function PosInterface() {
             <UniversalModal
                 isOpen={showLogoutModal}
                 title="Keluar dari POS?"
-                description="Anda akan keluar dari sesi kasir saat ini."
-                tone="warning"
+                description={logoutError ?? 'Anda akan keluar dari sesi kasir saat ini.'}
+                tone={logoutError ? 'danger' : 'warning'}
                 confirmLabel="Ya, Keluar"
                 cancelLabel="Batal"
-                onClose={() => setShowLogoutModal(false)}
+                isLoading={isLoggingOut}
+                onClose={() => {
+                    if (!isLoggingOut) {
+                        setShowLogoutModal(false);
+                    }
+                }}
                 onConfirm={confirmLogout}
             />
 

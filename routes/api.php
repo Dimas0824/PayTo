@@ -12,7 +12,6 @@ use App\Http\Controllers\Api\PosSettingsController;
 use App\Http\Controllers\Api\ProductQueryController;
 use App\Http\Controllers\Api\ReceiptSettingsController;
 use App\Http\Controllers\Api\StaffManagementController;
-use App\Http\Controllers\Auth\PosLogoutController;
 use Illuminate\Support\Facades\Route;
 
 // Admin API endpoints - Supervisor only
@@ -59,8 +58,6 @@ Route::middleware(['web', 'auth', 'role:CASHIER,SUPERVISOR'])->prefix('pos')->na
     Route::get('/profile', [PosApiController::class, 'profile'])->name('profile');
     Route::post('/checkout', [PosCheckoutController::class, 'store'])->middleware('throttle:checkout')->name('checkout');
     Route::post('/refunds', [PosRefundController::class, 'store'])->middleware('throttle:refund')->name('refunds');
-    Route::post('/logout', [PosLogoutController::class, 'store'])->name('logout');
-
     // Settings
     Route::get('/settings', [PosSettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/printer', [PosSettingsController::class, 'updatePrinter'])->name('settings.printer');
