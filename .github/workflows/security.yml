@@ -1,0 +1,62 @@
+name: Security
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Weekly on Monday
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+      
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction
+      
+      - name: Check for security vulnerabilities (Composer)
+        run: composer audit
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install NPM dependencies
+        run: npm ci
+      
+      - name: Check for security vulnerabilities (NPM)
+        run: npm audit --audit-level=moderate
+      
+      - name: Run security checks
+        run: |
+          # Check for exposed secrets in .env.example
+          if grep -E "(password|secret|key)=.+" .env.example; then
+            echo "::error::Potential secrets found in .env.example"
+            exit 1
+          fi
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
