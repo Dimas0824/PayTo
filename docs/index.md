@@ -15,12 +15,23 @@ Panduan berorientasi pembelajaran yang membantu Anda memulai. Ikuti langkah demi
 
 ### Panduan Cara Melakukan (How-to)
 Dokumentasi berorientasi pemecahan masalah. Temukan solusi untuk tugas-tugas spesifik seperti setup sync offline atau manajemen staf.
+- **[Panduan Cara Melakukan (How-to)](./how-to/index.md)** - Kumpulan panduan praktis untuk tugas-tugas spesifik
+ - [Mengelola Produk](./how-to/manage-products.md) - Cara menambah, mengubah, dan menghapus produk
+ - [Workflow Approval](./how-to/approval-workflow.md) - Menangani proses approval refund
+ - [Setup Offline Sync](./how-to/offline-sync-setup.md) - Konfigurasi sinkronisasi offline PWA
+ - [Manajemen Staf](./how-to/staff-management.md) - Mengelola kasir dan supervisor
+ - [Push Notifications](./how-to/push-notifications.md) - Setup dan kelola notifikasi push
 
 ### Referensi
 Konten berorientasi informasi. Spesifikasi teknis, endpoint API, skema database, dan detail konfigurasi.
 
 ### Penjelasan (Explanations)
 Konsep dan pemahaman. Diskusi mendalam tentang alasan arsitektur, mekanisme, dan keputusan desain sistem.
+- **[Penjelasan (Explanations)](./explanation/index.md)** - Konsep dan pemahaman mendalam sistem
+ - [Architecture](./explanation/architecture.md) - Arsitektur sistem dan tech stack
+ - [Offline Sync](./explanation/offline-sync.md) - Mekanisme sinkronisasi offline
+ - [Authentication](./explanation/authentication.md) - Sistem autentikasi dan otorisasi
+ - [PWA Strategy](./explanation/pwa-strategy.md) - Implementasi Progressive Web App
 
 ---
 
@@ -40,7 +51,6 @@ Konsep dan pemahaman. Diskusi mendalam tentang alasan arsitektur, mekanisme, dan
 - Review [Penjelasan](#penjelasan) untuk pemahaman arsitektur
 - Jelajahi [Referensi API](./reference/api.md) untuk detail endpoint
 - Buka issue di GitHub untuk bug atau permintaan fitur
-- Bergabunglah dengan forum diskusi kami (link akan ditambahkan)
 
 ---
 

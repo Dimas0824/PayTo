@@ -48,21 +48,46 @@ Kami terus mengembangkan PayTo untuk memberikan pengalaman yang lebih baik. Beri
 
 ## Galeri Aplikasi
 
-### Halaman Landing
+### Halaman Utama dan Login
 ![Landing Page](docs/gallery/landing.png)
 *Halaman utama PayTo POS*
 
-### Login
-![Login Page](docs/gallery/login.png)
+![Login Page](docs/gallery/Login.png)
 *Login dengan username/password atau PIN 6 digit*
 
-### Dashboard Admin
-![Admin Dashboard](docs/gallery/admin.png)
-*Dashboard admin dengan ringkasan penjualan dan stok*
-
 ### Interface Kasir
-![Kasir Interface](docs/gallery/kasir.png)
-*Interface kasir untuk proses checkout yang cepat dan mudah*
+
+![Kasir Dashboard](docs/gallery/kasir%20Dashboard.png)
+*Dashboard kasir untuk proses transaksi*
+
+![Kasir Menu Favorit](docs/gallery/kasir%20Menu%20Fav.png)
+*Menu favorit untuk akses cepat produk populer*
+
+![Riwayat Transaksi](docs/gallery/kasir%20Riwayat%20Transaksi.png)
+*Riwayat transaksi yang telah dilakukan*
+
+![Profile Kasir](docs/gallery/kasir%20Profile.png)
+*Profil dan informasi kasir*
+
+![Settings Kasir](docs/gallery/kasir%20Settings.png)
+*Pengaturan aplikasi kasir*
+
+### Dashboard Admin
+
+![Admin Dashboard](docs/gallery/admin%20Dashboard.png)
+*Dashboard admin dengan ringkasan penjualan dan analitik*
+
+![Manajemen Barang](docs/gallery/admin%20Manajemen%20Barang.png)
+*Manajemen produk dan stok*
+
+![Smart Inventory](docs/gallery/admin%20Smart%20Inventory.png)
+*Rekomendasi restock otomatis dan analisis inventori*
+
+![Manajemen Staff](docs/gallery/admin%20Manajemen%20Staff.png)
+*Kelola kasir dan supervisor*
+
+![Setting Struk](docs/gallery/admin%20Setting%20Struk.png)
+*Kustomisasi tampilan struk*
 
 ---
 
